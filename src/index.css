@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-black: #0a0a0a;
+  --color-brand-dark: #111111;
+  --color-brand-card: #1a1a1a;
+  --color-brand-lime: #C8F135;
+  --color-brand-white: #f0ede8;
+  --color-brand-muted: rgba(240,237,232,0.5);
+  --color-brand-border: rgba(240,237,232,0.1);
+
+  --font-family-display: "Bebas Neue", sans-serif;
+  --font-family-body: "DM Sans", sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--color-brand-black);
+    color: var(--color-brand-white);
+    font-family: var(--font-family-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #C8F135; }
+}
