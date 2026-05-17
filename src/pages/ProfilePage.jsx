@@ -128,6 +128,19 @@ export default function ProfilePage() {
           </Link>
         </div>
 
+        {/* Admin - só aparece para admins */}
+        {profile?.role === 'admin' && (
+          <Link
+            to="/admin"
+            className="block bg-[#C8F135]/10 border border-[#C8F135]/30 rounded-sm p-5 hover:bg-[#C8F135]/20 transition-colors mb-6"
+          >
+            <p className="text-xs tracking-widest uppercase text-[#C8F135] mb-1">Acesso restrito</p>
+            <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white">
+              Painel Admin →
+            </p>
+          </Link>
+        )}
+
         {/* Sair */}
         <button
           onClick={handleLogout}
