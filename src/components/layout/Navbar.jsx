@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
+import logo from '../../assets/logo-transparente.png'
 
 export default function Navbar() {
   const { totalItems } = useCart()
@@ -11,7 +12,7 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
         <Link to="/" className="font-display text-2xl tracking-widest text-brand-white">
-          <span className="text-brand-lime">&lt;</span>VHX<span className="text-brand-lime">&gt;</span>
+          <img src={logo} alt="VHX Store" className="h-30 w-auto" />
         </Link>
 
         <ul className="hidden md:flex items-center gap-8">

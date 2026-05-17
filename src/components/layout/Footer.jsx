@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import logo from '../../assets/logo-transparente.png'
 
 export default function Footer() {
   return (
@@ -6,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="col-span-2 md:col-span-1">
           <p className="font-display text-2xl tracking-widest text-brand-white mb-3">
-            <span className="text-brand-lime">&lt;</span>VHX<span className="text-brand-lime">&gt;</span>
+            <img src={logo} alt="VHX Store" className="h-20 w-auto" />
           </p>
           <p className="text-brand-muted text-sm leading-relaxed">
             Streetwear sem compromisso.<br />Cada peça é uma declaração.
