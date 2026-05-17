@@ -37,12 +37,20 @@ export default function Navbar() {
 
         <div className="flex items-center gap-5">
           {isAuthenticated ? (
-            <button
-              onClick={logout}
-              className="text-xs tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
-            >
-              Sair
-            </button>
+            <div className="flex items-center gap-4">
+              <Link
+                to="/perfil"
+                className="text-xs tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+              >
+                Perfil
+              </Link>
+              <button
+                onClick={logout}
+                className="text-xs tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+              >
+                Sair
+              </button>
+            </div>
           ) : (
             <Link to="/login" className="text-xs tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors">
               Entrar

@@ -10,6 +10,7 @@ import CartPage      from './pages/CartPage'
 import LoginPage     from './pages/LoginPage'
 import RegisterPage  from './pages/RegisterPage'
 import NotFoundPage  from './pages/NotFoundPage'
+import ProfilePage   from './pages/ProfilePage'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/carrinho"    element={<CartPage />} />
                 <Route path="/login"       element={<LoginPage />} />
                 <Route path="/cadastro"    element={<RegisterPage />} />
+                <Route path="/perfil"     element={<ProfilePage />} />
                 <Route path="*"            element={<NotFoundPage />} />
               </Routes>
             </main>
