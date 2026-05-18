@@ -26,3 +26,83 @@
   ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
   ::-webkit-scrollbar-thumb:hover { background: #C8F135; }
 }
+
+/* ===== GLITCH EFFECT ===== */
+.glitch {
+  position: relative;
+  cursor: pointer;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.glitch::before {
+  color: #C8F135;
+  clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+  transform: translateX(0);
+}
+
+.glitch::after {
+  color: #ff2d55;
+  clip-path: polygon(0 55%, 100% 55%, 100% 70%, 0 70%);
+  transform: translateX(0);
+}
+
+.glitch:hover::before {
+  opacity: 1;
+  animation: glitch-top 0.3s steps(2) infinite;
+}
+
+.glitch:hover::after {
+  opacity: 1;
+  animation: glitch-bottom 0.3s steps(2) infinite;
+}
+
+@keyframes glitch-top {
+  0%   { transform: translateX(-3px); clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); }
+  25%  { transform: translateX(3px);  clip-path: polygon(0 10%, 100% 10%, 100% 35%, 0 35%); }
+  50%  { transform: translateX(-2px); clip-path: polygon(0 25%, 100% 25%, 100% 45%, 0 45%); }
+  75%  { transform: translateX(2px);  clip-path: polygon(0 15%, 100% 15%, 100% 30%, 0 30%); }
+  100% { transform: translateX(-3px); clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); }
+}
+
+@keyframes glitch-bottom {
+  0%   { transform: translateX(3px);  clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+  25%  { transform: translateX(-3px); clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+  50%  { transform: translateX(2px);  clip-path: polygon(0 50%, 100% 50%, 100% 70%, 0 70%); }
+  75%  { transform: translateX(-2px); clip-path: polygon(0 65%, 100% 65%, 100% 85%, 0 85%); }
+  100% { transform: translateX(3px);  clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+}
+
+/* ===== GLITCH IMAGE ===== */
+.group:hover .glitch-img-1 {
+  animation: glitch-img 0.3s steps(2) infinite;
+}
+
+.group:hover .glitch-img-2 {
+  animation: glitch-img-2 0.3s steps(2) infinite;
+}
+
+@keyframes glitch-img {
+  0%   { transform: translate(-3px, 0); opacity: 0.7; clip-path: polygon(0 15%, 100% 15%, 100% 40%, 0 40%); }
+  25%  { transform: translate(3px, 0);  opacity: 0.5; clip-path: polygon(0 25%, 100% 25%, 100% 50%, 0 50%); }
+  50%  { transform: translate(-2px, 0); opacity: 0.6; clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+  75%  { transform: translate(2px, 0);  opacity: 0.4; clip-path: polygon(0 20%, 100% 20%, 100% 45%, 0 45%); }
+  100% { transform: translate(-3px, 0); opacity: 0.7; clip-path: polygon(0 15%, 100% 15%, 100% 40%, 0 40%); }
+}
+
+@keyframes glitch-img-2 {
+  0%   { transform: translate(3px, 0);  opacity: 0.6; clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+  25%  { transform: translate(-3px, 0); opacity: 0.4; clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+  50%  { transform: translate(2px, 0);  opacity: 0.5; clip-path: polygon(0 50%, 100% 50%, 100% 70%, 0 70%); }
+  75%  { transform: translate(-2px, 0); opacity: 0.3; clip-path: polygon(0 65%, 100% 65%, 100% 85%, 0 85%); }
+  100% { transform: translate(3px, 0);  opacity: 0.6; clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+}

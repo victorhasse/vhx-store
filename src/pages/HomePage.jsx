@@ -81,13 +81,13 @@ export default function HomePage() {
     <div className="bg-[#0a0a0a] min-h-screen">
 
       {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-16 pb-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-16 md:pb-24 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         <div>
           <span className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#C8F135] mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C8F135] inline-block"></span>
             Nova Coleção — SS25
           </span>
-          <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-[88px] leading-[0.9] tracking-wide text-white mb-6">
+          <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-[56px] md:text-[88px] leading-[0.9] tracking-wide text-white mb-6">
             VISTA<br />O<br /><span className="text-[#C8F135]">FUTURO</span>
           </h1>
           <p className="text-white/50 text-sm leading-relaxed max-w-sm mb-10">
@@ -153,7 +153,7 @@ export default function HomePage() {
       </section>
 
       {/* CATEGORIAS */}
-      <section className="max-w-7xl mx-auto px-6 pb-24">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Roupas',     count: '24 peças'   },
@@ -175,7 +175,7 @@ export default function HomePage() {
       </section>
 
       {/* PRODUTOS DESTAQUE */}
-      <section className="max-w-7xl mx-auto px-6 pb-24">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="flex justify-between items-baseline mb-8">
           <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl tracking-widest text-white">Destaques</h2>
           <Link to="/produtos" className="text-[11px] tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity">
@@ -192,14 +192,14 @@ export default function HomePage() {
       </section>
 
       {/* BANNER */}
-      <section className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="bg-[#C8F135] rounded-sm px-12 py-16 flex flex-col md:flex-row items-center justify-between gap-8">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
+        <div className="bg-[#C8F135] rounded-sm px-6 md:px-12 py-10 md:py-16 flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
             <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">Novidade da semana</p>
-            <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl tracking-widest text-black">
+            <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl md:text-5xl tracking-widest text-black">
               NOVO DROP<br />DISPONÍVEL
             </h2>
-          </div>
+        </div>
           <Link to="/produtos" className="bg-black text-[#C8F135] text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-80 transition-opacity whitespace-nowrap">
             Ver coleção
           </Link>
