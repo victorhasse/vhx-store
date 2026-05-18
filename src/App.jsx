@@ -15,6 +15,9 @@ import AdminRoute          from './components/AdminRoute'
 import AdminPage           from './pages/admin/AdminPage'
 import AdminProducts       from './pages/admin/AdminProducts'
 import AdminProductForm    from './pages/admin/AdminProductForm'
+import CheckoutPage           from './pages/CheckoutPage'
+import OrderConfirmationPage  from './pages/OrderConfirmationPage'
+import OrdersPage             from './pages/OrdersPage'
 
 export default function App() {
   return (
@@ -37,6 +40,9 @@ export default function App() {
                 <Route path="/admin/produtos" element={<AdminRoute><AdminProducts /></AdminRoute>} />
                 <Route path="/admin/produtos/novo" element={<AdminRoute><AdminProductForm /></AdminRoute>} />
                 <Route path="/admin/produtos/:id/editar" element={<AdminRoute><AdminProductForm /></AdminRoute>} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/pedido/:id" element={<OrderConfirmationPage />} />
+                <Route path="/pedidos" element={<OrdersPage />} />
               </Routes>
             </main>
             <Footer />

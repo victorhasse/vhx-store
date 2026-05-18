@@ -145,9 +145,12 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <button className="w-full bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 active:scale-95 transition-all mb-3">
-                Finalizar pedido
-              </button>
+              <Link
+                to="/checkout"
+                className="block w-full bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 active:scale-95 transition-all mb-3 text-center"
+              >
+                Finalizar compra
+              </Link>
 
               <Link
                 to="/produtos"
