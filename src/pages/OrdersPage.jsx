@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { orderService } from '../services/orderService'
+import { OrderCardSkeleton } from '../components/ui/Skeleton'
 
 const STATUS_MAP = {
   pending:   { label: 'Aguardando', color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
@@ -38,7 +39,11 @@ export default function OrdersPage() {
         </div>
 
         {loading ? (
-          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <OrderCardSkeleton key={i} />
+            ))}
+          </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6">
             <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-4xl tracking-widest text-white/10">

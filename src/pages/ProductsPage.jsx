@@ -2,18 +2,21 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { productService } from '../services/productService'
+import { ProductCardSkeleton } from '../components/ui/Skeleton'
+import { useScrollFadeIn } from '../hooks/useFadeIn'
 
 const CATEGORIES = [
-  { value: '',            label: 'Tudo' },
-  { value: 'camisetas',  label: 'Camisetas' },
-  { value: 'calcas',     label: 'Calças' },
-  { value: 'moletons',   label: 'Moletons' },
+  { value: '',            label: 'Tudo'       },
+  { value: 'camisetas',  label: 'Camisetas'  },
+  { value: 'calcas',     label: 'Calças'     },
+  { value: 'moletons',   label: 'Moletons'   },
   { value: 'acessorios', label: 'Acessórios' },
 ]
 
-function ProductCard({ product }) {
+function ProductCard({ product, index }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
+  const { ref, visible } = useScrollFadeIn()
 
   function handleAdd() {
     addItem(product)
@@ -22,14 +25,23 @@ function ProductCard({ product }) {
   }
 
   return (
-    <div className="group bg-[#111] rounded-sm overflow-hidden">
-      <Link to={`/produtos/${product.id}`} className="block relative aspect-[3/4] bg-[#1a1a1a] flex items-center justify-center overflow-hidden">
+    <div
+      ref={ref}
+      className={`fade-in stagger-${Math.min(index + 1, 8)} ${visible ? 'visible' : ''} group bg-[#111] rounded-sm overflow-hidden`}
+    >
+      <Link to={`/produtos/${product.id}`} className="block relative aspect-[3/4] bg-[#1a1a1a] overflow-hidden">
         {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white/10 group-hover:scale-110 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-          </svg>
+          <div className="w-full h-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white/10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+          </div>
         )}
         {product.badge && (
           <span className="absolute top-2 left-2 bg-[#C8F135] text-black text-[10px] font-bold tracking-widest uppercase px-2 py-1">
@@ -42,7 +54,6 @@ function ProductCard({ product }) {
           </span>
         )}
       </Link>
-
       <div className="p-4">
         <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{product.category}</p>
         <Link to={`/produtos/${product.id}`}>
@@ -57,9 +68,7 @@ function ProductCard({ product }) {
           <button
             onClick={handleAdd}
             className={`text-[10px] tracking-widest uppercase px-3 py-1.5 border transition-all duration-200 ${
-              added
-                ? 'border-[#C8F135] text-[#C8F135]'
-                : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
+              added ? 'border-[#C8F135] text-[#C8F135]' : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
             }`}
           >
             {added ? '✓ Adicionado' : '+ Carrinho'}
@@ -71,11 +80,12 @@ function ProductCard({ product }) {
 }
 
 export default function ProductsPage() {
-  const [products, setProducts]           = useState([])
-  const [loading, setLoading]             = useState(true)
-  const [error, setError]                 = useState(null)
+  const [products, setProducts]             = useState([])
+  const [loading, setLoading]               = useState(true)
+  const [error, setError]                   = useState(null)
   const [activeCategory, setActiveCategory] = useState('')
-  const [search, setSearch]               = useState('')
+  const [search, setSearch]                 = useState('')
+  const { ref: headerRef, visible: headerVisible } = useScrollFadeIn()
 
   useEffect(() => {
     setLoading(true)
@@ -91,12 +101,15 @@ export default function ProductsPage() {
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-16">
 
         {/* Header */}
-        <div className="mb-12">
+        <div
+          ref={headerRef}
+          className={`fade-in ${headerVisible ? 'visible' : ''} mb-12`}
+        >
           <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3">VHX Store</p>
-          <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white mb-8">
+          <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl md:text-6xl tracking-widest text-white mb-8">
             Coleção
           </h1>
           <input
@@ -125,22 +138,19 @@ export default function ProductsPage() {
           ))}
         </div>
 
-        {/* Estados */}
+        {/* Skeleton */}
         {loading && (
-          <div className="flex items-center justify-center py-32">
-            <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">
-              Carregando produtos...
-            </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         )}
 
         {error && (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <p className="text-red-400 text-sm tracking-wider">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70"
-            >
+            <button onClick={() => window.location.reload()} className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70">
               Tentar novamente
             </button>
           </div>
@@ -151,10 +161,9 @@ export default function ProductsPage() {
             <p className="text-xs tracking-widest uppercase text-white/20 mb-6">
               {filtered.length} {filtered.length === 1 ? 'produto' : 'produtos'}
             </p>
-
             {filtered.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+                {filtered.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-4">
