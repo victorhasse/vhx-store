@@ -119,7 +119,7 @@ export default function OrderConfirmPage() {
         {/* Ações */}
         <div className="flex gap-3">
           <Link
-            to="/perfil/pedidos"
+            to="/pedidos"
             className="flex-1 text-center border border-white/10 text-white/40 text-xs tracking-widest uppercase py-4 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
           >
             Meus pedidos
