@@ -8,79 +8,79 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-brand-border mt-24">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-
-        <div className="col-span-2 md:col-span-1">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Logo e descrição — centralizado no mobile */}
+        <div className="flex flex-col items-center md:items-start mb-8 md:mb-0 md:hidden">
           <img src={logo} alt="VHX Store" className="h-20 w-auto mb-3" />
-          <p className="text-brand-muted text-sm leading-relaxed">
+          <p className="text-brand-muted text-sm leading-relaxed text-center">
             {t('footer.tagline_1')}<br />{t('footer.tagline_2')}
           </p>
         </div>
 
-        <div>
-          <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.store')}</p>
-          <ul className="space-y-2">
-            {[
-              t('nav.collection'),
-              t('nav.clothes'),
-              t('nav.accessories'),
-            ].map(item => (
-              <li key={item}>
-                <Link to="/produtos" className="text-sm text-brand-muted hover:text-brand-white transition-colors">{item}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.account')}</p>
-          <ul className="space-y-2">
-            {[
-              [t('nav.login'),    '/login'   ],
-              [t('nav.register'), '/cadastro'],
-              ['Carrinho',        '/carrinho'],
-            ].map(([label, to]) => (
-              <li key={to}>
-                <Link to={to} className="text-sm text-brand-muted hover:text-brand-white transition-colors">{label}</Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.social')}</p>
-          <ul className="space-y-2">
-            {[
-              ['Instagram', '#'],
-              ['TikTok',    '#'],
-              ['GitHub',    'https://github.com/victorhasse'],
-            ].map(([label, href]) => (
-              <li key={label}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-brand-muted hover:text-brand-white transition-colors"
-                >
-                  {label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
+        {/* Logo — só aparece no desktop */}
+        <div className="hidden md:flex flex-col items-start">
+          <img src={logo} alt="VHX Store" className="h-20 w-auto mb-3" />
+          <p className="text-brand-muted text-sm leading-relaxed">
+            {t('footer.tagline_1')}<br />{t('footer.tagline_2')}
+          </p>
       </div>
+
+      <div>
+        <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.store')}</p>
+        <ul className="space-y-2">
+          {[t('nav.collection'), t('nav.clothes'), t('nav.accessories')].map(item => (
+            <li key={item}>
+              <Link to="/produtos" className="text-sm text-brand-muted hover:text-brand-white transition-colors">{item}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.account')}</p>
+        <ul className="space-y-2">
+          {[
+            [t('nav.login'),    '/login'   ],
+            [t('nav.register'), '/cadastro'],
+            [t('cart.title'),   '/carrinho'],
+          ].map(([label, to]) => (
+            <li key={to}>
+              <Link to={to} className="text-sm text-brand-muted hover:text-brand-white transition-colors">{label}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p className="text-xs tracking-widest uppercase text-brand-muted mb-4">{t('footer.social')}</p>
+        <ul className="space-y-2">
+          {[
+            ['Instagram', '#'],
+            ['TikTok',    '#'],
+            ['GitHub',    'https://github.com/victorhasse'],
+          ].map(([label, href]) => (
+            <li key={label}>
+              <a href={href} target="_blank" rel="noopener noreferrer" className="text-sm text-brand-muted hover:text-brand-white transition-colors">
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
 
       {/* Rodapé inferior */}
       <div className="border-t border-brand-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-brand-muted tracking-wider">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col items-center md:flex-row md:justify-between gap-3">
+          <p className="text-xs text-brand-muted tracking-wider text-center md:text-left">
             © {new Date().getFullYear()} &lt;VHX&gt; Store. {t('footer.rights')}
           </p>
 
           {/* Language toggle discreto */}
           <LanguageToggle />
-
-          <p className="text-xs text-brand-muted tracking-wider">
+          <p className="text-xs text-brand-muted tracking-wider text-center md:text-right">
             {t('footer.developed')}{' '}
             <a
               href="https://github.com/victorhasse"

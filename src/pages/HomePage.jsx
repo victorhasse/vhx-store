@@ -2,13 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { productService } from '../services/productService'
 import { useCart } from '../context/CartContext'
+import { ProductCardSkeleton } from '../components/ui/Skeleton'
 import { useTranslation } from 'react-i18next'
-
-export default function HomePage() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [heroIndex, setHeroIndex] = useState(0)
-  const { t } = useTranslation()
 
 const HERO_IMAGES = [
   'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena1_pxymjz.png',
@@ -16,17 +11,18 @@ const HERO_IMAGES = [
   'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena3_zvkjdf.jpg',
 ]
 
-const CATEGORY_LABELS = {
-  camisetas:  t('products.shirts'),
-  calcas:     t('products.pants'),
-  moletons:   t('products.hoodies'),
-  acessorios: t('products.accessories'),
-  tenis:      t('products.sneakers'),
-}
-
 function ProductCard({ product }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
+  const { t } = useTranslation()
+
+  const CATEGORY_LABELS = {
+    camisetas:  t('products.shirts'),
+    calcas:     t('products.pants'),
+    moletons:   t('products.hoodies'),
+    acessorios: t('products.accessories'),
+    tenis:      t('products.sneakers'),
+}
 
   function handleAdd(e) {
     e.preventDefault()
@@ -73,6 +69,12 @@ function ProductCard({ product }) {
     </Link>
   )
 }
+
+export default function HomePage() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [heroIndex, setHeroIndex] = useState(0)
+  const { t } = useTranslation()
 
   useEffect(() => {
     productService.getAll()
@@ -173,10 +175,10 @@ function ProductCard({ product }) {
             <Link
               key={label}
               to="/produtos"
-              className="group relative h-32 bg-[#111] rounded-sm flex flex-col justify-end p-4 hover:bg-[#1a1a1a] transition-colors"
+              className="group relative h-24 md:h-32 bg-[#111] rounded-sm flex flex-col justify-end p-3 md:p-4 hover:bg-[#1a1a1a] transition-colors overflow-hidden"
             >
-              <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{count}</p>
-              <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-2xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors">
+              <p className="text-[9px] md:text-[10px] tracking-widest uppercase text-white/30 mb-1 truncate">{count}</p>
+              <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-sm md:text-2xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors leading-tight truncate">
                 {label}
               </p>
             </Link>
@@ -193,9 +195,13 @@ function ProductCard({ product }) {
           </Link>
         </div>
         {loading ? (
-          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {products.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
@@ -204,7 +210,7 @@ function ProductCard({ product }) {
       {/* BANNER */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="bg-[#C8F135] rounded-sm px-6 md:px-12 py-10 md:py-16 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div>
+          <div className="text-center md:text-left">
             <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">{t('home.banner_tag')}</p>
             <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl md:text-5xl tracking-widest text-black">
               {t('home.banner_title_1')}<br />{t('home.banner_title_2')}
