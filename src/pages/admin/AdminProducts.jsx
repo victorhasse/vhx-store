@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { productService } from '../../services/productService'
+import { useTranslation } from 'react-i18next'
 
 export default function AdminProducts() {
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [loading, setLoading]   = useState(true)
   const [deleting, setDeleting] = useState(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     productService.getAll()
@@ -35,22 +37,22 @@ export default function AdminProducts() {
         <div className="flex items-center justify-between mb-12">
           <div>
             <Link to="/admin" className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3 block hover:opacity-70">
-              ← Painel Admin
+              {t('admin.back_admin')}
             </Link>
             <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white">
-              Produtos
+              {t('admin.products')}
             </h1>
           </div>
           <Link
             to="/admin/produtos/novo"
             className="bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase px-6 py-3 hover:opacity-90 transition-opacity"
           >
-            + Novo produto
+            {t('admin.new_product')}
           </Link>
         </div>
 
         {loading ? (
-          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
         ) : (
           <div className="space-y-2">
             {products.map(product => (
@@ -78,7 +80,7 @@ export default function AdminProducts() {
                   <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-wider text-[#C8F135]">
                     R$ {Number(product.price).toFixed(2).replace('.', ',')}
                   </p>
-                  <p className="text-[10px] text-white/30">estoque: {product.stock}</p>
+                  <p className="text-[10px] text-white/30">{t('product.stock')}: {product.stock}</p>
                 </div>
 
                 {/* Badge */}
@@ -98,14 +100,14 @@ export default function AdminProducts() {
                     onClick={() => navigate(`/admin/produtos/${product.id}/editar`)}
                     className="text-[10px] tracking-widest uppercase border border-white/10 text-white/40 px-3 py-2 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
                   >
-                    Editar
+                    {t('admin.edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(product.id, product.name)}
                     disabled={deleting === product.id}
                     className="text-[10px] tracking-widest uppercase border border-white/10 text-white/40 px-3 py-2 hover:border-red-500/50 hover:text-red-400 transition-all disabled:opacity-50"
                   >
-                    {deleting === product.id ? '...' : 'Remover'}
+                    {deleting === product.id ? '...' : t('admin.remove')}
                   </button>
                 </div>
               </div>

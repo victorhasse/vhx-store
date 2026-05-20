@@ -10,6 +10,7 @@ import {
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { paymentService } from '../services/paymentService'
+import { useTranslation } from 'react-i18next'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
 
@@ -34,6 +35,8 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
 
+  const { t } = useTranslation()
+
   function handleAddressChange(e) {
     setAddress(prev => ({ ...prev, [e.target.name]: e.target.value }))
     setAddressError('')
@@ -45,7 +48,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
     if (!stripe || !elements) return
 
     if (!address.street || !address.number || !address.city || !address.state || !address.zipcode) {
-      setAddressError('Preencha todos os campos obrigatórios.')
+      setAddressError(t('checkout.error_address'))
       return
     }
 
@@ -80,7 +83,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
         navigate(`/pedido/${orderId}`)
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao processar pagamento.')
+      setError(err.response?.data?.error || { message: t('checkout.error_payment') })
     } finally {
       setLoading(false)
     }
@@ -91,7 +94,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
 
       {/* Endereço */}
       <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-2xl tracking-widest text-white mb-4">
-        Endereço de entrega
+        {t('checkout.delivery')}
       </p>
 
       {addressError && (
@@ -101,7 +104,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
       )}
 
       <div>
-        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">CEP *</label>
+        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.zipcode')} *</label>
         <input
           name="zipcode" value={address.zipcode} onChange={handleAddressChange}
           placeholder="00000-000"
@@ -118,7 +121,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
 
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Rua *</label>
+          <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.street')} *</label>
           <input
             name="street" value={address.street} onChange={handleAddressChange}
             placeholder="Nome da rua"
@@ -127,7 +130,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
           />
         </div>
         <div>
-          <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Número *</label>
+          <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.number')} *</label>
           <input
           name="number" value={address.number} onChange={handleAddressChange}
           placeholder="123"
@@ -140,7 +143,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
 
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Complemento</label>
+        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.complement')}</label>
         <input
           name="complement" value={address.complement} onChange={handleAddressChange}
           placeholder="Apto, bloco..."
@@ -149,7 +152,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
         />
       </div>
       <div>
-        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Bairro</label>
+        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.neighborhood')}</label>
         <input
           name="neighborhood" value={address.neighborhood} onChange={handleAddressChange}
           placeholder="Bairro"
@@ -161,7 +164,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
 
     <div className="grid grid-cols-3 gap-4">
       <div className="col-span-2">
-        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Cidade *</label>
+        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.city')} *</label>
         <input
           name="city" value={address.city} onChange={handleAddressChange}
           placeholder="Sua cidade"
@@ -171,7 +174,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
         />
       </div>
       <div>
-        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Estado *</label>
+        <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('checkout.state')} *</label>
         <input
           name="state" value={address.state} onChange={handleAddressChange}
           placeholder="SC"
@@ -185,7 +188,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
       {/* Pagamento */}
       <div className="pt-4">
         <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-2xl tracking-widest text-white mb-4">
-          Pagamento
+          {t('checkout.payment')}
         </p>
 
         <div className="bg-[#111] border border-white/10 px-4 py-4 focus-within:border-[#C8F135] transition-colors">
@@ -196,13 +199,13 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          Pagamento seguro via Stripe — modo teste
+          {t('checkout.secure')}
         </p>
 
         <div className="mt-3 bg-[#C8F135]/5 border border-[#C8F135]/20 px-4 py-3 rounded-sm">
-          <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-1">Cartão de teste</p>
+          <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-1">{t('checkout.test_card')}</p>
           <p className="text-xs text-white/40 font-mono">4242 4242 4242 4242</p>
-          <p className="text-xs text-white/30">Validade: qualquer data futura — CVC: qualquer 3 dígitos</p>
+          <p className="text-xs text-white/30">{t('checkout.test_card_sub')}</p>
         </div>
       </div>
 
@@ -217,7 +220,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
         disabled={loading || !stripe}
         className="w-full bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 mt-2"
       >
-        {loading ? 'Processando pagamento...' : `Pagar R$ ${totalPrice.toFixed(2).replace('.', ',')}`}
+        {loading ? t('checkout.processing') : ` ${t('checkout.pay')} R$ ${totalPrice.toFixed(2).replace('.', ',')}`}
       </button>
     </form>
   )

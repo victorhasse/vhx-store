@@ -2,12 +2,27 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { productService } from '../services/productService'
-
-const SIZES = ['P', 'M', 'G', 'GG']
+import { useTranslation } from 'react-i18next'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const { addItem } = useCart()
+  const { t } = useTranslation()
+
+  const SIZES = [
+  { value: 'S',  label: t('product.sizes.S')  },
+  { value: 'M',  label: t('product.sizes.M')  },
+  { value: 'L',  label: t('product.sizes.L')  },
+  { value: 'XL', label: t('product.sizes.XL') },
+]
+
+  const CATEGORY_LABELS = {
+  camisetas:  t('products.shirts'),
+  calcas:     t('products.pants'),
+  moletons:   t('products.hoodies'),
+  acessorios: t('products.accessories'),
+  tenis:      t('products.sneakers'),
+}
 
   const [product, setProduct]     = useState(null)
   const [loading, setLoading]     = useState(true)
@@ -19,7 +34,7 @@ export default function ProductDetail() {
   useEffect(() => {
     productService.getById(id)
       .then(res => setProduct(res.data))
-      .catch(() => setError('Produto não encontrado'))
+      .catch(() => setError(t('product.not_found')))
       .finally(() => setLoading(false))
   }, [id])
 
@@ -37,7 +52,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
       </div>
     )
   }
@@ -46,9 +61,9 @@ export default function ProductDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6">
         <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white/10">404</p>
-        <p className="text-white/40 text-sm tracking-widest uppercase">Produto não encontrado</p>
+        <p className="text-white/40 text-sm tracking-widest uppercase">{t('product.not_found')}</p>
         <Link to="/produtos" className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity">
-          ← Voltar à coleção
+          {t('product.back')}
         </Link>
       </div>
     )
@@ -62,7 +77,7 @@ export default function ProductDetail() {
         <nav className="flex items-center gap-2 text-[11px] tracking-widest uppercase text-white/30 mb-12">
           <Link to="/" className="hover:text-white transition-colors">Home</Link>
           <span>/</span>
-          <Link to="/produtos" className="hover:text-white transition-colors">Coleção</Link>
+          <Link to="/produtos" className="hover:text-white transition-colors">{t('products.title')}</Link>
           <span>/</span>
           <span className="text-white/60">{product.name}</span>
         </nav>
@@ -88,14 +103,15 @@ export default function ProductDetail() {
             )}
             {product.stock <= 3 && (
               <span className="absolute top-4 right-4 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-3 py-1">
-                Últimas {product.stock} unidades
+                {t('product.last_units')} {product.stock} {t('product.units')}
               </span>
             )}
           </div>
 
           {/* Info */}
           <div className="flex flex-col justify-center">
-            <p className="text-[11px] tracking-widest uppercase text-white/30 mb-3">{product.category}</p>
+            <p className="text-[11px] tracking-widest uppercase text-white/30 mb-3">
+            {CATEGORY_LABELS[product.category] || product.category}</p>
 
             <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl tracking-widest text-white mb-4">
               {product.name}
@@ -110,20 +126,20 @@ export default function ProductDetail() {
             {/* Tamanhos */}
             <div className="mb-8">
               <p className="text-[11px] tracking-widest uppercase text-white/40 mb-3">
-                Tamanho {sizeError && <span className="text-red-400 ml-2">— Selecione um tamanho</span>}
+                {t('product.size')} {sizeError && <span className="text-red-400 ml-2">{t('product.size_error')}</span>}
               </p>
               <div className="flex gap-2">
-                {SIZES.map(size => (
+                {SIZES.map(({ value, label }) => (
                   <button
-                    key={size}
-                    onClick={() => { setSelectedSize(size); setSizeError(false) }}
+                    key={value}
+                    onClick={() => { setSelectedSize(value); setSizeError(false) }}
                     className={`w-12 h-12 text-sm tracking-widest border transition-all duration-150 ${
-                      selectedSize === size
+                      selectedSize === value
                         ? 'bg-[#C8F135] border-[#C8F135] text-black font-medium'
                         : 'border-white/10 text-white/40 hover:border-white/40 hover:text-white/70'
                     }`}
                   >
-                    {size}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -138,15 +154,15 @@ export default function ProductDetail() {
                   : 'bg-[#C8F135] text-black hover:opacity-90 active:scale-95'
               }`}
             >
-              {added ? '✓ Adicionado ao carrinho' : 'Adicionar ao carrinho'}
+              {added ? t('product.added') : t('product.add_cart')}
             </button>
 
             {/* Detalhes */}
             <div className="mt-10 pt-8 border-t border-white/5 space-y-3">
               {[
                 ['SKU',        `VHX-${String(product.id).padStart(4, '0')}`],
-                ['Categoria',  product.category],
-                ['Estoque',    `${product.stock} unidades`],
+                [t('product.category'),  product.category],
+                [t('product.stock'),    `${product.stock} ${t('product.units')}`],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="text-white/30 tracking-wider">{label}</span>
@@ -162,7 +178,7 @@ export default function ProductDetail() {
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
-            Voltar à coleção
+            {t('product.back')}
           </Link>
         </div>
       </div>

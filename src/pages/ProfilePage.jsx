@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { authService } from '../services/authService'
+import { useTranslation } from 'react-i18next'
 
 export default function ProfilePage() {
   const { user, logout, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const [profile, setProfile]   = useState(null)
   const [loading, setLoading]   = useState(true)
@@ -18,7 +20,7 @@ export default function ProfilePage() {
     }
     authService.me()
       .then(res => setProfile(res.data))
-      .catch(() => setError('Erro ao carregar perfil.'))
+      .catch(() => setError(t('profile.error_load_profile')))
       .finally(() => setLoading(false))
   }, [isAuthenticated, navigate])
 
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
       </div>
     )
   }
@@ -39,7 +41,7 @@ export default function ProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="text-red-400 text-sm">{error}</p>
-        <Link to="/" className="text-xs tracking-widest uppercase text-[#C8F135]">Voltar</Link>
+        <Link to="/" className="text-xs tracking-widest uppercase text-[#C8F135]">{t('common.back_store')}</Link>
       </div>
     )
   }
@@ -52,7 +54,7 @@ export default function ProfilePage() {
         <div className="mb-12">
           <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3">VHX Store</p>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white">
-            Meu Perfil
+            {t('profile.title')}
           </h1>
         </div>
 
@@ -79,14 +81,14 @@ export default function ProfilePage() {
         {/* Informações */}
         <div className="bg-[#111] rounded-sm p-6 mb-6">
           <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white mb-6">
-            Informações da Conta
+            {t('profile.account_info')}
           </p>
           <div className="space-y-4">
             {[
-              ['Nome',          profile?.name],
-              ['E-mail',        profile?.email],
-              ['Tipo de conta', profile?.role === 'admin' ? 'Administrador' : 'Cliente'],
-              ['Membro desde',  profile?.createdAt
+              [t('profile.name'),          profile?.name],
+              [t('profile.email'),        profile?.email],
+              [t('profile.account_type'), profile?.role === 'admin' ? t('profile.admin') : t('profile.customer')],
+              [t('profile.member_since'),  profile?.createdAt
                 ? new Date(profile.createdAt).toLocaleDateString('pt-BR', {
                     day: '2-digit', month: 'long', year: 'numeric'
                   })
@@ -111,7 +113,7 @@ export default function ProfilePage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
             <p className="text-xs tracking-widest uppercase text-white/50 group-hover:text-white transition-colors">
-              Ver coleção
+              {t('profile.see_collection')}
             </p>
           </Link>
 
@@ -119,8 +121,10 @@ export default function ProfilePage() {
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#C8F135] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
             </svg>
-            <p className="text-xs tracking-widest uppercase text-white/50 group-hover:text-white transition-colors">Meus pedidos</p>
-            </Link>
+            <p className="text-xs tracking-widest uppercase text-white/50 group-hover:text-white transition-colors">
+              {t('profile.my_orders')}
+            </p>
+          </Link>
         </div>
 
         {/* Admin - só aparece para admins */}
@@ -129,9 +133,9 @@ export default function ProfilePage() {
             to="/admin"
             className="block bg-[#C8F135]/10 border border-[#C8F135]/30 rounded-sm p-5 hover:bg-[#C8F135]/20 transition-colors mb-6"
           >
-            <p className="text-xs tracking-widest uppercase text-[#C8F135] mb-1">Acesso restrito</p>
+            <p className="text-xs tracking-widest uppercase text-[#C8F135] mb-1">{t('profile.restricted')}</p>
             <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white">
-              Painel Admin →
+              {t('profile.admin_panel')}
             </p>
           </Link>
         )}
@@ -141,7 +145,7 @@ export default function ProfilePage() {
           onClick={handleLogout}
           className="w-full border border-white/10 text-white/40 text-xs tracking-widest uppercase py-4 hover:border-red-500/50 hover:text-red-400 transition-all duration-200"
         >
-          Sair da conta
+          {t('profile.logout')}
         </button>
 
       </div>

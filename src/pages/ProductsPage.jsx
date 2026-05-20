@@ -4,19 +4,22 @@ import { useCart } from '../context/CartContext'
 import { productService } from '../services/productService'
 import { ProductCardSkeleton } from '../components/ui/Skeleton'
 import { useScrollFadeIn } from '../hooks/useFadeIn'
+import { useTranslation } from 'react-i18next'
+import { t } from 'i18next'
 
-const CATEGORIES = [
-  { value: '',            label: 'Tudo'       },
-  { value: 'camisetas',  label: 'Camisetas'  },
-  { value: 'calcas',     label: 'Calças'     },
-  { value: 'moletons',   label: 'Moletons'   },
-  { value: 'acessorios', label: 'Acessórios' },
-]
+const CATEGORY_LABELS = {
+  camisetas:  t('products.shirts'),
+  calcas:     t('products.pants'),
+  moletons:   t('products.hoodies'),
+  acessorios: t('products.accessories'),
+  tenis:      t('products.sneakers'),
+}
 
 function ProductCard({ product, index }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
   const { ref, visible } = useScrollFadeIn()
+  const { t } = useTranslation()
 
   function handleAdd() {
     addItem(product)
@@ -50,12 +53,14 @@ function ProductCard({ product, index }) {
         )}
         {product.stock <= 3 && (
           <span className="absolute top-2 right-2 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-2 py-1">
-            Últimas
+            {t('products.last_units')}
           </span>
         )}
       </Link>
       <div className="p-4">
-        <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{product.category}</p>
+        <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">
+          {CATEGORY_LABELS[product.category] || product.category}
+        </p>
         <Link to={`/produtos/${product.id}`}>
           <h3 className="text-sm font-medium text-white/90 mb-3 group-hover:text-[#C8F135] transition-colors">
             {product.name}
@@ -71,7 +76,7 @@ function ProductCard({ product, index }) {
               added ? 'border-[#C8F135] text-[#C8F135]' : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
             }`}
           >
-            {added ? '✓ Adicionado' : '+ Carrinho'}
+            {added ? t('products.added') : t('products.add_cart')}
           </button>
         </div>
       </div>
@@ -86,12 +91,22 @@ export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState('')
   const [search, setSearch]                 = useState('')
   const { ref: headerRef, visible: headerVisible } = useScrollFadeIn()
+  const { t } = useTranslation()
+
+  const CATEGORIES = [
+  { value: '',           label: t('products.all')         },
+  { value: 'camisetas',  label: t('products.shirts')      },
+  { value: 'calcas',     label: t('products.pants')       },
+  { value: 'moletons',   label: t('products.hoodies')     },
+  { value: 'acessorios', label: t('products.accessories') },
+  { value: 'tenis',      label: t('products.sneakers')    }
+]
 
   useEffect(() => {
     setLoading(true)
     productService.getAll(activeCategory ? { category: activeCategory } : {})
       .then(res => setProducts(res.data))
-      .catch(() => setError('Erro ao carregar produtos.'))
+      .catch(() => setError({ message: t('products.error') }))
       .finally(() => setLoading(false))
   }, [activeCategory])
 
@@ -110,11 +125,11 @@ export default function ProductsPage() {
         >
           <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3">VHX Store</p>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl md:text-6xl tracking-widest text-white mb-8">
-            Coleção
+            {t('products.title')}
           </h1>
           <input
             type="text"
-            placeholder="Buscar produto..."
+            placeholder={t('products.search')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full md:w-80 bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
@@ -151,7 +166,7 @@ export default function ProductsPage() {
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <p className="text-red-400 text-sm tracking-wider">{error}</p>
             <button onClick={() => window.location.reload()} className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70">
-              Tentar novamente
+              {t('products.retry')}
             </button>
           </div>
         )}
@@ -159,7 +174,7 @@ export default function ProductsPage() {
         {!loading && !error && (
           <>
             <p className="text-xs tracking-widest uppercase text-white/20 mb-6">
-              {filtered.length} {filtered.length === 1 ? 'produto' : 'produtos'}
+              {filtered.length} {filtered.length === 1 ? t('products.products_count') : t('products.products_count_plural')}
             </p>
             {filtered.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -168,13 +183,13 @@ export default function ProductsPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-32 gap-4">
                 <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-4xl tracking-widest text-white/10">
-                  Nenhum resultado
+                  {t('products.no_results')}
                 </p>
                 <button
                   onClick={() => { setSearch(''); setActiveCategory('') }}
                   className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity"
                 >
-                  Limpar filtros
+                  {t('products.clear_filters')}
                 </button>
               </div>
             )}

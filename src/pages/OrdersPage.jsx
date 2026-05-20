@@ -3,20 +3,22 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { orderService } from '../services/orderService'
 import { OrderCardSkeleton } from '../components/ui/Skeleton'
-
-const STATUS_MAP = {
-  pending:   { label: 'Aguardando', color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-  confirmed: { label: 'Confirmado', color: 'text-[#C8F135]',  bg: 'bg-[#C8F135]/10' },
-  shipped:   { label: 'Enviado',    color: 'text-blue-400',   bg: 'bg-blue-400/10'  },
-  delivered: { label: 'Entregue',   color: 'text-green-400',  bg: 'bg-green-400/10' },
-  cancelled: { label: 'Cancelado',  color: 'text-red-400',    bg: 'bg-red-400/10'   },
-}
+import { useTranslation } from 'react-i18next'
 
 export default function OrdersPage() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [orders, setOrders]   = useState([])
   const [loading, setLoading] = useState(true)
+  const { t } = useTranslation()
+
+  const STATUS_MAP = {
+    pending:   { label: t('orders.pending'),   color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    confirmed: { label: t('orders.confirmed'), color: 'text-[#C8F135]',  bg: 'bg-[#C8F135]/10' },
+    shipped:   { label: t('orders.shipped'),   color: 'text-blue-400',   bg: 'bg-blue-400/10'  },
+    delivered: { label: t('orders.delivered'), color: 'text-green-400',  bg: 'bg-green-400/10' },
+    cancelled: { label: t('orders.cancelled'), color: 'text-red-400',    bg: 'bg-red-400/10'   },
+  }
 
   useEffect(() => {
     if (!isAuthenticated) { navigate('/login'); return }
@@ -31,10 +33,10 @@ export default function OrdersPage() {
 
         <div className="mb-12">
           <Link to="/perfil" className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3 block hover:opacity-70">
-            ← Meu perfil
+            {t('orders.back')}
           </Link>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white">
-            Meus Pedidos
+            {t('orders.title')}
           </h1>
         </div>
 
@@ -47,10 +49,10 @@ export default function OrdersPage() {
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-6">
             <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-4xl tracking-widest text-white/10">
-              Nenhum pedido ainda
+              {t('orders.empty')}
             </p>
             <Link to="/produtos" className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70">
-              Explorar coleção →
+              {t('orders.explore')}
             </Link>
           </div>
         ) : (
@@ -66,7 +68,7 @@ export default function OrdersPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <p className="text-xs tracking-widest uppercase text-white/30 mb-1">
-                        Pedido #{String(order.id).padStart(6, '0')}
+                        {t('orders.order')} #{String(order.id).padStart(6, '0')}
                       </p>
                       <p className="text-xs text-white/30">
                         {new Date(order.createdAt).toLocaleDateString('pt-BR', {
@@ -102,7 +104,7 @@ export default function OrdersPage() {
 
                   <div className="flex justify-between items-center">
                     <p className="text-xs text-white/30">
-                      {order.items?.length} {order.items?.length === 1 ? 'item' : 'itens'}
+                      {order.items?.length} {order.items?.length === 1 ? t('orders.items') : t('orders.items_plural')}
                     </p>
                     <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-wider text-[#C8F135]">
                       R$ {Number(order.total).toFixed(2).replace('.', ',')}

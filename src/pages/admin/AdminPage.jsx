@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { productService } from '../../services/productService'
 import { authService } from '../../services/authService'
+import { useTranslation } from 'react-i18next'
 
 export default function AdminPage() {
   const { user } = useAuth()
   const [stats, setStats] = useState({ products: 0, users: 0 })
+  const { t } = useTranslation()
 
   useEffect(() => {
     productService.getAll()
@@ -22,17 +24,17 @@ export default function AdminPage() {
         <div className="mb-12">
           <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3">VHX Store</p>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-6xl tracking-widest text-white mb-2">
-            Painel Admin
+            {t('admin.title')}
           </h1>
-          <p className="text-white/30 text-sm">Bem-vindo, {user?.name}</p>
+          <p className="text-white/30 text-sm">{t('admin.welcome')}, {user?.name}</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
           {[
-            { label: 'Produtos ativos', value: stats.products, icon: '📦' },
-            { label: 'Categorias',      value: 4,              icon: '🏷️' },
-            { label: 'API status',      value: 'Online',       icon: '✅' },
+            { label: t('admin.products'),        value: stats.products, icon: '📦' },
+            { label: t('admin.categories'),      value: 4,              icon: '🏷️' },
+            { label: t('admin.api_status'),      value: 'Online',       icon: '✅' },
           ].map(({ label, value, icon }) => (
             <div key={label} className="bg-[#111] rounded-sm p-6">
               <p className="text-2xl mb-3">{icon}</p>
@@ -47,7 +49,7 @@ export default function AdminPage() {
         {/* Ações rápidas */}
         <div className="mb-6">
           <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-2xl tracking-widest text-white mb-4">
-            Gerenciar
+            {t('admin.manage')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
@@ -56,10 +58,10 @@ export default function AdminPage() {
             >
               <div>
                 <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors mb-1">
-                  Produtos
+                  {t('admin.products')}
                 </p>
                 <p className="text-xs tracking-widest uppercase text-white/30">
-                  Adicionar, editar e remover
+                  {t('admin.products_sub')}
                 </p>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white/20 group-hover:text-[#C8F135] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -73,10 +75,10 @@ export default function AdminPage() {
             >
               <div>
                 <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors mb-1">
-                  Ver loja
+                  {t('admin.see_store')}
                 </p>
                 <p className="text-xs tracking-widest uppercase text-white/30">
-                  Visualizar como cliente
+                  {t('admin.see_store_sub')}
                 </p>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white/20 group-hover:text-[#C8F135] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

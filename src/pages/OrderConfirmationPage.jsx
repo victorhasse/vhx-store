@@ -1,30 +1,33 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { orderService } from '../services/orderService'
-
-const STATUS = {
-  pending:   { label: 'Aguardando',  color: 'text-yellow-400' },
-  confirmed: { label: 'Confirmado',  color: 'text-blue-400'   },
-  shipped:   { label: 'Enviado',     color: 'text-purple-400' },
-  delivered: { label: 'Entregue',    color: 'text-[#C8F135]'  },
-  cancelled: { label: 'Cancelado',   color: 'text-red-400'    },
-}
+import { useTranslation } from 'react-i18next'
 
 export default function OrderConfirmPage() {
   const { id } = useParams()
   const [order, setOrder]   = useState(null)
   const [loading, setLoading] = useState(true)
+  const { t } = useTranslation()
+
+  const STATUS_MAP = {
+    pending:   { label: t('orders.pending'),   color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    confirmed: { label: t('orders.confirmed'), color: 'text-[#C8F135]',  bg: 'bg-[#C8F135]/10' },
+    shipped:   { label: t('orders.shipped'),   color: 'text-blue-400',   bg: 'bg-blue-400/10'  },
+    delivered: { label: t('orders.delivered'), color: 'text-green-400',  bg: 'bg-green-400/10' },
+    cancelled: { label: t('orders.cancelled'), color: 'text-red-400',    bg: 'bg-red-400/10'   },
+  }
 
   useEffect(() => {
     orderService.getById(id)
       .then(res => setOrder(res.data))
+      .catch(err => console.error(err))
       .finally(() => setLoading(false))
   }, [id])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
       </div>
     )
   }
@@ -32,14 +35,14 @@ export default function OrderConfirmPage() {
   if (!order) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="text-white/30 text-sm">Pedido não encontrado.</p>
-        <Link to="/" className="text-xs tracking-widest uppercase text-[#C8F135]">Voltar</Link>
+        <p className="text-white/30 text-sm">{t('orders.not_found')}</p>
+        <Link to="/" className="text-xs tracking-widest uppercase text-[#C8F135]">{t('order_confirmation.back')}</Link>
       </div>
     )
   }
 
   const address = order.address ? JSON.parse(order.address) : null
-  const status  = STATUS[order.status] || STATUS.pending
+  const status  = STATUS_MAP[order.status] || STATUS_MAP.pending
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
@@ -49,17 +52,17 @@ export default function OrderConfirmPage() {
         <div className="text-center mb-16">
           <p className="text-5xl mb-6">🎉</p>
           <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl tracking-widest text-white mb-3">
-            Pedido confirmado!
+            {t('order_confirmation.title')}
           </p>
           <p className="text-white/40 text-sm">
-            Pedido <span className="text-white/70">#{String(order.id).padStart(5, '0')}</span> realizado com sucesso.
+            {t('order_confirmation.order')} <span className="text-white/70">#{String(order.id).padStart(5, '0')}</span> {t('order_confirmation.success')}
           </p>
         </div>
 
         {/* Status */}
         <div className="bg-[#111] rounded-sm p-6 mb-4">
           <div className="flex justify-between items-center">
-            <p className="text-xs tracking-widest uppercase text-white/30">Status</p>
+            <p className="text-xs tracking-widest uppercase text-white/30">{t('order_confirmation.status')}</p>
             <p className={`text-sm font-medium tracking-wider ${status.color}`}>
               {status.label}
             </p>
@@ -69,7 +72,7 @@ export default function OrderConfirmPage() {
         {/* Itens */}
         <div className="bg-[#111] rounded-sm p-6 mb-4">
           <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white mb-4">
-            Itens do pedido
+            {t('order_confirmation.items')}
           </p>
           <div className="space-y-4">
             {order.items?.map(item => (
@@ -105,13 +108,13 @@ export default function OrderConfirmPage() {
         {address && (
           <div className="bg-[#111] rounded-sm p-6 mb-8">
             <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-widest text-white mb-4">
-              Endereço de entrega
+              {t('order_confirmation.delivery')}
             </p>
             <p className="text-sm text-white/50 leading-relaxed">
               {address.street}, {address.number}
               {address.complement && ` — ${address.complement}`}<br />
               {address.city}{address.state && ` — ${address.state}`}<br />
-              CEP: {address.zip}
+              {t('checkout.zipcode')}: {address.zip}
             </p>
           </div>
         )}
@@ -122,13 +125,13 @@ export default function OrderConfirmPage() {
             to="/pedidos"
             className="flex-1 text-center border border-white/10 text-white/40 text-xs tracking-widest uppercase py-4 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
           >
-            Meus pedidos
+            {t('order_confirmation.see_orders')}
           </Link>
           <Link
             to="/produtos"
             className="flex-1 text-center bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 transition-opacity"
           >
-            Continuar comprando
+            {t('order_confirmation.keep_shopping')}
           </Link>
         </div>
 

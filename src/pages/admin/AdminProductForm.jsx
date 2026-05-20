@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { productService } from '../../services/productService'
+import { useTranslation } from 'react-i18next'
 
-const CATEGORIES = ['camisetas', 'calcas', 'moletons', 'acessorios']
+const CATEGORIES = ['camisetas', 'calcas', 'moletons', 'acessorios', 'tenis']
 
 const EMPTY = {
   name: '', description: '', price: '', category: 'camisetas',
@@ -13,6 +14,7 @@ export default function AdminProductForm() {
   const { id }     = useParams()
   const navigate   = useNavigate()
   const isEditing  = !!id
+  const { t } = useTranslation()
 
   const [form, setForm]       = useState(EMPTY)
   const [loading, setLoading] = useState(false)
@@ -32,7 +34,7 @@ export default function AdminProductForm() {
         badge:       res.data.badge       || '',
         image_url:   res.data.image_url   || '',
       }))
-      .catch(() => setError('Erro ao carregar produto.'))
+      .catch(() => setError(t('products.error')))
       .finally(() => setLoading(false))
   }, [id, isEditing])
 
@@ -44,7 +46,7 @@ export default function AdminProductForm() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.name || !form.price || !form.category) {
-      setError('Preencha nome, preço e categoria.')
+      setError(t('admin.error_all_fields'))
       return
     }
     setSaving(true)
@@ -63,7 +65,7 @@ export default function AdminProductForm() {
       }
       navigate('/admin/produtos')
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao salvar produto.')
+      setError(err.response?.data?.error || t('admin.error_save'))
     } finally {
       setSaving(false)
     }
@@ -72,7 +74,7 @@ export default function AdminProductForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+        <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
       </div>
     )
   }
@@ -84,10 +86,10 @@ export default function AdminProductForm() {
         {/* Header */}
         <div className="mb-12">
           <Link to="/admin/produtos" className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3 block hover:opacity-70">
-            ← Voltar aos produtos
+            {t('admin.back_products')}
           </Link>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-5xl tracking-widest text-white">
-            {isEditing ? 'Editar Produto' : 'Novo Produto'}
+            {isEditing ? t('admin.edit_product') : t('admin.new_product_title')}
           </h1>
         </div>
 
@@ -101,7 +103,7 @@ export default function AdminProductForm() {
 
           {/* Nome */}
           <div>
-            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Nome *</label>
+            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('profile.name')} *</label>
             <input
               name="name" value={form.name} onChange={handleChange}
               placeholder="Ex: Oversized Tee VHX"
@@ -111,7 +113,7 @@ export default function AdminProductForm() {
 
           {/* Descrição */}
           <div>
-            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Descrição</label>
+            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.description')}</label>
             <textarea
               name="description" value={form.description} onChange={handleChange}
               placeholder="Descrição do produto..."
@@ -123,7 +125,7 @@ export default function AdminProductForm() {
           {/* Preço e Estoque */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Preço (R$) *</label>
+              <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.price')} (R$) *</label>
               <input
                 name="price" value={form.price} onChange={handleChange}
                 type="number" step="0.01" placeholder="149.00"
@@ -131,7 +133,7 @@ export default function AdminProductForm() {
               />
             </div>
             <div>
-              <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Estoque</label>
+              <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.stock')}</label>
               <input
                 name="stock" value={form.stock} onChange={handleChange}
                 type="number" placeholder="10"
@@ -142,20 +144,22 @@ export default function AdminProductForm() {
 
           {/* Categoria */}
           <div>
-            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Categoria *</label>
+            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.category')} *</label>
             <select
               name="category" value={form.category} onChange={handleChange}
               className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors"
             >
               {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>
+                  {t(`admin.categories_create.${cat}`)}
+                </option>
               ))}
             </select>
           </div>
 
           {/* Badge */}
           <div>
-            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">Badge <span className="text-white/20">(opcional)</span></label>
+            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.badge')} <span className="text-white/20">(opcional)</span></label>
             <input
               name="badge" value={form.badge} onChange={handleChange}
               placeholder="Ex: Novo, Drop, Sale"
@@ -165,7 +169,7 @@ export default function AdminProductForm() {
 
           {/* Imagem */}
           <div>
-            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">URL da imagem <span className="text-white/20">(Cloudinary)</span></label>
+            <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">{t('admin.image_url')} <span className="text-white/20">(Cloudinary)</span></label>
             <input
               name="image_url" value={form.image_url} onChange={handleChange}
               placeholder="https://res.cloudinary.com/..."
@@ -185,13 +189,13 @@ export default function AdminProductForm() {
               disabled={saving}
               className="flex-1 bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
             >
-              {saving ? 'Salvando...' : isEditing ? 'Salvar alterações' : 'Criar produto'}
+              {saving ? t('admin.saving') : isEditing ? t('admin.save') : t('admin.create')}
             </button>
             <Link
               to="/admin/produtos"
               className="px-6 border border-white/10 text-white/40 text-xs tracking-widest uppercase flex items-center hover:border-white/30 transition-colors"
             >
-              Cancelar
+              {t('admin.cancel')}
             </Link>
           </div>
         </form>

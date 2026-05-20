@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { authService } from '../services/authService'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate  = useNavigate()
+  const { t } = useTranslation()
 
   const [form, setForm]       = useState({ email: '', password: '' })
   const [error, setError]     = useState('')
@@ -19,7 +21,7 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.email || !form.password) {
-      setError('Preencha todos os campos')
+      setError(t('checkout.error_address'))
       return
     }
     try {
@@ -28,7 +30,7 @@ export default function LoginPage() {
       login(res.data.user, res.data.token)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao entrar. Tente novamente.')
+      setError(err.response?.data?.error || t('profile.error_login'))
     } finally {
       setLoading(false)
     }
@@ -48,10 +50,10 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-[#111] rounded-sm p-8">
           <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl tracking-widest text-white mb-2">
-            Entrar
+            {t('auth.login_title')}
           </p>
           <p className="text-white/30 text-sm mb-8">
-            Acesse sua conta VHX Store
+            {t('auth.login_sub')}
           </p>
 
           {error && (
@@ -63,7 +65,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">
-                E-mail
+                {t('auth.email')}
               </label>
               <input
                 type="email"
@@ -77,7 +79,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">
-                Senha
+                {t('auth.password')}
               </label>
               <input
                 type="password"
@@ -94,16 +96,16 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase py-4 hover:opacity-90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? t('auth.logging_in') : t('auth.login_btn')}
             </button>
           </form>
         </div>
 
         {/* Link cadastro */}
         <p className="text-center text-white/30 text-sm mt-6">
-          Não tem conta?{' '}
+          {t('auth.no_account')}{' '}
           <Link to="/cadastro" className="text-[#C8F135] hover:opacity-70 transition-opacity">
-            Cadastre-se
+            {t('auth.sign_up')}
           </Link>
         </p>
 

@@ -2,12 +2,27 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { productService } from '../services/productService'
 import { useCart } from '../context/CartContext'
+import { useTranslation } from 'react-i18next'
+
+export default function HomePage() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [heroIndex, setHeroIndex] = useState(0)
+  const { t } = useTranslation()
 
 const HERO_IMAGES = [
   'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena1_pxymjz.png',
   'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena2_lwx782.jpg',
   'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena3_zvkjdf.jpg',
 ]
+
+const CATEGORY_LABELS = {
+  camisetas:  t('products.shirts'),
+  calcas:     t('products.pants'),
+  moletons:   t('products.hoodies'),
+  acessorios: t('products.accessories'),
+  tenis:      t('products.sneakers'),
+}
 
 function ProductCard({ product }) {
   const { addItem } = useCart()
@@ -39,7 +54,7 @@ function ProductCard({ product }) {
         )}
       </div>
       <div className="p-4">
-        <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{product.category}</p>
+        <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{CATEGORY_LABELS[product.category] || product.category}</p>
         <h3 className="text-sm font-medium text-white/90 mb-3 group-hover:text-[#C8F135] transition-colors">{product.name}</h3>
         <div className="flex items-center justify-between gap-2">
           <span style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-wider text-[#C8F135]">
@@ -51,18 +66,13 @@ function ProductCard({ product }) {
               added ? 'border-[#C8F135] text-[#C8F135]' : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
             }`}
           >
-            {added ? '✓ Adicionado' : '+ Carrinho'}
+            {added ? t('home.added') : t('home.add_cart')}
           </button>
         </div>
       </div>
     </Link>
   )
 }
-
-export default function HomePage() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [heroIndex, setHeroIndex] = useState(0)
 
   useEffect(() => {
     productService.getAll()
@@ -85,20 +95,20 @@ export default function HomePage() {
         <div>
           <span className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#C8F135] mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C8F135] inline-block"></span>
-            Nova Coleção — SS25
+            {t('home.tag')}
           </span>
           <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-[56px] md:text-[88px] leading-[0.9] tracking-wide text-white mb-6">
-            VISTA<br />O<br /><span className="text-[#C8F135]">FUTURO</span>
+            {t('home.hero_title_1')}<br />{t('home.hero_title_2')}<br /><span className="text-[#C8F135]">{t('home.hero_title_3')}</span>
           </h1>
           <p className="text-white/50 text-sm leading-relaxed max-w-sm mb-10">
-            Streetwear sem compromisso. Cada peça é uma declaração. Drop limitado toda semana.
+            {t('home.hero_sub')}
           </p>
           <div className="flex items-center gap-4">
             <Link to="/produtos" className="bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-90 transition-opacity">
-              Explorar coleção
+              {t('home.explore')}
             </Link>
             <Link to="/produtos" className="text-white/50 text-xs tracking-widest uppercase hover:text-white transition-colors flex items-center gap-2">
-              Ver drops
+              {t('home.drops')}
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -156,9 +166,9 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Roupas',     count: '24 peças'   },
-            { label: 'Acessórios', count: '12 peças'   },
-            { label: 'Novidades',  count: 'Drops SS25' },
+            { label: t('home.clothes_label'),     count: t('home.clothes_count')       },
+            { label: t('home.accessories_label'), count: t('home.accessories_count')   },
+            { label: t('home.news_label'),        count: t('home.news_count')          },
           ].map(({ label, count }) => (
             <Link
               key={label}
@@ -177,13 +187,13 @@ export default function HomePage() {
       {/* PRODUTOS DESTAQUE */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="flex justify-between items-baseline mb-8">
-          <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl tracking-widest text-white">Destaques</h2>
+          <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl tracking-widest text-white">{t('home.highlights')}</h2>
           <Link to="/produtos" className="text-[11px] tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity">
-            Ver tudo →
+            {t('home.see_all')}
           </Link>
         </div>
         {loading ? (
-          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">Carregando...</p>
+          <p className="text-white/20 text-xs tracking-widest uppercase animate-pulse">{t('common.loading')}</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {products.map(p => <ProductCard key={p.id} product={p} />)}
@@ -195,13 +205,13 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="bg-[#C8F135] rounded-sm px-6 md:px-12 py-10 md:py-16 flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
-            <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">Novidade da semana</p>
+            <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">{t('home.banner_tag')}</p>
             <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl md:text-5xl tracking-widest text-black">
-              NOVO DROP<br />DISPONÍVEL
+              {t('home.banner_title_1')}<br />{t('home.banner_title_2')}
             </h2>
         </div>
           <Link to="/produtos" className="bg-black text-[#C8F135] text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-80 transition-opacity whitespace-nowrap">
-            Ver coleção
+            {t('home.see_collection')}
           </Link>
         </div>
       </section>
