@@ -1,3 +1,7 @@
+<div align="center">
+
+<img width="200" height="200" alt="favicon" src="https://github.com/user-attachments/assets/3b896291-a76e-4e08-a7ad-8d2b93f4cfc9" />
+
 # &lt;VHX&gt; Store — Frontend
 
 Streetwear clothing and accessories e-commerce, developed as a portfolio project.
@@ -8,6 +12,8 @@ Streetwear clothing and accessories e-commerce, developed as a portfolio project
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black&style=flat-square)
 ![i18n](https://img.shields.io/badge/i18n-PT%2FEN-green?style=flat-square)
 ![Stripe](https://img.shields.io/badge/Stripe-Sandbox-635BFF?logo=stripe&logoColor=white&style=flat-square)
+
+</div>
 
 <p align="center">
   🇺🇸 English | <a href="docs/README_PT.md">🇧🇷 Português</a>
@@ -111,7 +117,13 @@ npm run deploy
 
 ## 📸 Screenshots
 
-> Coming soon
+| Homepage | Productspage |
+| :---: | :---: |
+| <img width="1512" height="860" alt="Homepage" src="https://github.com/user-attachments/assets/17c1c007-819b-4401-b0b9-f7900358f1fd" /> | <img width="1512" height="860" alt="ProductsPage" src="https://github.com/user-attachments/assets/bf3cc72a-6164-4c32-81d3-d39b2911c3da" /> |
+| Cart | Cart - payment |
+| <img width="1512" height="860" alt="Cart" src="https://github.com/user-attachments/assets/2b3d7927-9090-4b48-9016-306e6fcea8db" /> | <img width="1512" height="860" alt="Cart - payment" src="https://github.com/user-attachments/assets/e77e484b-da65-44dc-9eaa-73171ea6047f" /> |
+| Checkout | Order confirmed |
+| <img width="1512" height="860" alt="Checkout" src="https://github.com/user-attachments/assets/e6518a6b-eda1-457c-9993-f77550c6311e" /> | <img width="1512" height="860" alt="Order confirmed" src="https://github.com/user-attachments/assets/57a583d6-edbe-4371-ab9a-f1cf5e6575d1" /> |
 
 ## 👨‍💻 Credits
 
