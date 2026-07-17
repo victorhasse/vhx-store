@@ -56,38 +56,81 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
     setError('')
 
     try {
-      // 1. Cria o PaymentIntent no backend
-      const intentRes = await paymentService.createIntent({ items, address })
-      const { clientSecret, orderId } = intentRes.data
+      /*
+      * O frontend envia somente identificação,
+      * quantidade e tamanho. O backend busca
+      * os preços verdadeiros no banco.
+      */
+     const checkoutItems = items.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize || null,
+      }))
 
-      // 2. Confirma o pagamento no Stripe
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+      const intentRes =
+        await paymentService.createIntent({
+          items: checkoutItems,
+          address,
+        })
+
+      const {
         clientSecret,
-        {
-          payment_method: {
-            card: elements.getElement(CardElement),
-          },
-        }
-      )
+        orderId,
+      } = intentRes.data
+
+      const {
+        error: stripeError,
+        paymentIntent,
+      } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+        },
+      })
 
       if (stripeError) {
+        /*
+        * cancela o paymentIntent. O webhook
+        * devolverá o estoque reservado.
+        */
+       try {
+          await paymentService.cancel({ orderId })
+        } catch (cancelError) {
+          console.error('Falha ao cancelar o pedido:', cancelError)
+        }
+
         setError(stripeError.message)
-        setLoading(false)
         return
       }
 
-      if (paymentIntent.status === 'succeeded') {
-        // 3. Confirma o pedido no backend
-        await paymentService.confirm({ orderId })
-        clearCart()
-        navigate(`/pedido/${orderId}`)
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || { message: t('checkout.error_payment') })
-    } finally {
-      setLoading(false)
+      if (
+        paymentIntent.status === 'succeeded'
+      ) {
+        /*
+       * Confirma imediatamente para melhorar
+       * a navegação. O webhook continua sendo
+       * a garantia independente.
+       */
+      await paymentService.confirm({
+        orderId,
+      })
+
+      clearCart()
+      navigate(`/pedido/${orderId}`)
+      return
     }
+
+    setError(
+      t('checkout.error_payment')
+    )
+  } catch (err) {
+    setError(
+      err.response?.data?.error ||
+      t('checkout.error_payment')
+    )
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
