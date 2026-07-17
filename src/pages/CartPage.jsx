@@ -48,7 +48,7 @@ function CartItem({ item }) {
             )}
           </div>
           <button
-            onClick={() => removeItem(item.id)}
+            onClick={() => removeItem(item.cartItemKey)}
             className="text-white/20 hover:text-red-400 transition-colors ml-4"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -61,14 +61,14 @@ function CartItem({ item }) {
           {/* Quantidade */}
           <div className="flex items-center border border-white/10">
             <button
-              onClick={() => item.quantity > 1 ? updateQty(item.id, item.quantity - 1) : removeItem(item.id)}
+              onClick={() => item.quantity > 1 ? updateQty(item.cartItemKey, item.quantity - 1) : removeItem(item.cartItemKey)}
               className="w-8 h-8 text-white/40 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center text-lg"
             >
               −
             </button>
             <span className="w-8 text-center text-sm text-white/70">{item.quantity}</span>
             <button
-              onClick={() => updateQty(item.id, item.quantity + 1)}
+              onClick={() => updateQty(item.cartItemKey, item.quantity + 1)}
               className="w-8 h-8 text-white/40 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center text-lg"
             >
               +
@@ -129,7 +129,7 @@ function CartItem({ item }) {
           {/* Lista de itens */}
           <div className="lg:col-span-2">
             {items.map(item => (
-              <CartItem key={`${item.id}-${item.selectedSize}`} item={item} />
+              <CartItem key={item.cartItemKey} item={item} />
             ))}
           </div>
 
