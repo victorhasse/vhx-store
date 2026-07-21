@@ -97,6 +97,12 @@ export default function AdminProducts() {
                 {/* Ações */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
+                    onClick={() => navigate(`/admin/produtos/${product.id}/opcoes`)}
+                    className="text-[10px] tracking-widest uppercase border border-white/10 text-white/40 px-3 py-2 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
+                  >
+                    {t('admin.options')}
+                  </button>
+                  <button
                     onClick={() => navigate(`/admin/produtos/${product.id}/editar`)}
                     className="text-[10px] tracking-widest uppercase border border-white/10 text-white/40 px-3 py-2 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
                   >

@@ -18,6 +18,7 @@ import AdminProductForm    from './pages/admin/AdminProductForm'
 import CheckoutPage           from './pages/CheckoutPage'
 import OrderConfirmationPage  from './pages/OrderConfirmationPage'
 import OrdersPage             from './pages/OrdersPage'
+import AdminProductOptions from './pages/admin/AdminProductOptions'
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/pedido/:id" element={<OrderConfirmationPage />} />
                 <Route path="/pedidos" element={<OrdersPage />} />
+                <Route path="/admin/produtos/:id/opcoes" element={<AdminRoute><AdminProductOptions /></AdminRoute>} />
               </Routes>
             </main>
             <Footer />
