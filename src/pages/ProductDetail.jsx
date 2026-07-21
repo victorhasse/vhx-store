@@ -4,6 +4,17 @@ import { useCart } from '../context/CartContext'
 import { productService } from '../services/productService'
 import { useTranslation } from 'react-i18next'
 
+import {
+  findSelectedVariant,
+  getAvailableSizes,
+  getColorImages,
+  getPrimaryImage,
+  getProductColors,
+  getProductVariants,
+  getVariantPrice,
+  getVariantsForColor,
+} from '../utils/productVariants'
+
 export default function ProductDetail() {
   const { id } = useParams()
   const { addItem } = useCart()
@@ -28,6 +39,9 @@ export default function ProductDetail() {
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState(null)
   const [selectedSize, setSelectedSize] = useState(null)
+  const [selectedColorId, setSelectedColorId] = useState(null)
+  const [activeImage, setActiveImage] = useState(null)
+  const [optionError, setOptionError] = useState('')
   const [added, setAdded]         = useState(false)
   const [sizeError, setSizeError] = useState(false)
 
@@ -37,16 +51,175 @@ export default function ProductDetail() {
       .catch(() => setError(t('product.not_found')))
       .finally(() => setLoading(false))
   }, [id])
+  useEffect(() => {
+    if (!product) return
 
+    setActiveImage(
+      getPrimaryImage(product, null)
+    )
+  }, [product])
+  const colors = getProductColors(product)
+  const variants = getProductVariants(product)
+
+  const variantsForColor =
+    getVariantsForColor(
+      product,
+      selectedColorId
+    )
+
+  const availableSizes =
+    getAvailableSizes(variantsForColor)
+
+  const selectedVariant =
+    findSelectedVariant(
+      variantsForColor,
+      selectedSize
+    )
+
+  const selectedColor =
+    colors.find(
+      color =>
+        Number(color.id) ===
+        Number(selectedColorId)
+    ) || null
+
+  const displayedPrice =
+    getVariantPrice(
+      product,
+      selectedVariant
+    )
+
+  const displayedStock = selectedVariant
+    ? Number(selectedVariant.stock)
+    : variants.length > 0
+      ? variantsForColor.reduce(
+          (total, variant) =>
+            total + Number(variant.stock),
+          0
+        )
+      : Number(product?.stock || 0)
+
+  const displayedImages =
+    getColorImages(
+      product,
+      selectedColorId
+    )
+
+  const sizeOptions =
+    variants.length > 0
+      ? availableSizes.map(value => ({
+          value,
+          label: t(
+            `product.sizes.${value}`,
+            {
+              defaultValue: value,
+            }
+          ),
+        }))
+      : SIZES
+  function handleColorSelect(color) {
+    setSelectedColorId(color.id)
+    setSelectedSize(null)
+    setSizeError(false)
+    setOptionError('')
+
+    setActiveImage(
+      getPrimaryImage(product, color.id)
+    )
+  }
   function handleAdd() {
-    if (!selectedSize) {
-      setSizeError(true)
-      setTimeout(() => setSizeError(false), 2000)
-      return
+    if (variants.length > 0) {
+      if (
+        colors.length > 0 &&
+        !selectedColorId
+      ) {
+        setOptionError(
+          'Selecione uma cor'
+        )
+        return
+      }
+
+      const hasSizedVariants =
+        variantsForColor.some(
+          variant => variant.size
+        )
+
+      if (
+        hasSizedVariants &&
+        !selectedSize
+      ) {
+        setSizeError(true)
+
+        setTimeout(
+          () => setSizeError(false),
+          2000
+        )
+
+        return
+      }
+
+      if (
+        !selectedVariant ||
+        Number(selectedVariant.stock) <= 0
+      ) {
+        setOptionError(
+          'Esta opção não está disponível'
+        )
+        return
+      }
+
+      addItem({
+        ...product,
+        variantId: selectedVariant.id,
+        selectedSize:
+          selectedVariant.size || null,
+        selectedColor: selectedColor
+          ? {
+              id: selectedColor.id,
+              name: selectedColor.name,
+              slug: selectedColor.slug,
+              hex_code:
+                selectedColor.hex_code,
+            }
+          : null,
+        sku: selectedVariant.sku,
+        stock: Number(selectedVariant.stock),
+        price: getVariantPrice(
+          product,
+          selectedVariant
+        ),
+        image_url:
+          activeImage ||
+          product.image_url,
+      })
+    } else {
+      /*
+      * Compatibilidade com o catálogo antigo.
+      */
+      if (!selectedSize) {
+        setSizeError(true)
+
+        setTimeout(
+          () => setSizeError(false),
+          2000
+        )
+
+        return
+      }
+
+      addItem({
+        ...product,
+        selectedSize,
+      })
     }
-    addItem({ ...product, selectedSize })
+
     setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+    setOptionError('')
+
+    setTimeout(
+      () => setAdded(false),
+      2000
+    )
   }
 
   if (loading) {
@@ -86,8 +259,9 @@ export default function ProductDetail() {
 
           {/* Imagem */}
           <div className="relative aspect-square bg-[#111] rounded-sm flex items-center justify-center overflow-hidden">
-            {product.image_url ? (
-              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            {activeImage ? (
+              <img src={activeImage} alt={
+                selectedColor ? `${product.name} - ${selectedColor.name}` : product.name} className="w-full h-full object-cover" />
             ) : (
               <>
                 <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-[200px] text-white/5 tracking-tight select-none absolute">VHX</p>
@@ -101,12 +275,31 @@ export default function ProductDetail() {
                 {product.badge}
               </span>
             )}
-            {product.stock <= 3 && (
+            {displayedStock > 0 && displayedStock <= 3 && (
               <span className="absolute top-4 right-4 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-3 py-1">
-                {t('product.last_units')} {product.stock} {t('product.units')}
+                {t('product.last_units')} {displayedStock} {t('product.units')}
               </span>
             )}
           </div>
+
+          {displayedImages.length > 1 && (
+            <div className="grid grid-cols-5 gap-3 mt-3">
+              {displayedImages.map(image => (
+                <button
+                  key={image.id}
+                  type="button"
+                  onClick={() => setActiveImage(image.image_url)}
+                  className={`aspect-square overflow-hidden border transition-colors ${
+                    activeImage === image.image_url
+                    ? 'border-[#C8F135]'
+                    : 'border-white/10 hover:border-white/40'
+                  }`}
+                >
+                  <img src={image.image_url} alt={image.alt_text || product.name} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Info */}
           <div className="flex flex-col justify-center">
@@ -118,10 +311,51 @@ export default function ProductDetail() {
             </h1>
 
             <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-4xl tracking-wider text-[#C8F135] mb-8">
-              R$ {Number(product.price).toFixed(2).replace('.', ',')}
+              R$ {displayedPrice.toFixed(2).replace('.', ',')}
             </p>
 
             <p className="text-white/50 text-sm leading-relaxed mb-10">{product.description}</p>
+
+            {colors.length > 0 && (
+              <div className="mb-8">
+                <p className="text-[11px] tracking-widest uppercase text-white/40 mb-3">
+                  Cor
+                  {selectedColor && (
+                    <span className="text-white/70 ml-2">
+                      {selectedColor.name}
+                    </span>
+                  )}
+                </p>
+
+              <div className="flex flex-wrap gap-3">
+                {colors.map(color => (
+                  <button
+                    key={color.id}
+                    type="button"
+                    title={color.name}
+                    aria-label={`Selecionar cor ${color.name}`}
+                    onClick={() =>
+                      handleColorSelect(color)
+                    }
+                    className={`w-11 h-11 p-1 border transition-all ${
+                      Number(selectedColorId) ===
+                      Number(color.id)
+                        ? 'border-[#C8F135]'
+                        : 'border-white/10 hover:border-white/40'
+                    }`}
+                  >
+                    <span
+                      className="block w-full h-full border border-white/10"
+                      style={{
+                        backgroundColor:
+                          color.hex_code,
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
             {/* Tamanhos */}
             <div className="mb-8">
@@ -129,7 +363,7 @@ export default function ProductDetail() {
                 {t('product.size')} {sizeError && <span className="text-red-400 ml-2">{t('product.size_error')}</span>}
               </p>
               <div className="flex gap-2">
-                {SIZES.map(({ value, label }) => (
+                {sizeOptions.map(({ value, label }) => (
                   <button
                     key={value}
                     onClick={() => { setSelectedSize(value); setSizeError(false) }}
@@ -144,7 +378,10 @@ export default function ProductDetail() {
                 ))}
               </div>
             </div>
-
+            {optionError && (
+              <p className="text-red-400 text-xs tracking-wider mb-5">
+                {optionError}</p>
+            )}
             {/* Botão */}
             <button
               onClick={handleAdd}
@@ -160,9 +397,19 @@ export default function ProductDetail() {
             {/* Detalhes */}
             <div className="mt-10 pt-8 border-t border-white/5 space-y-3">
               {[
-                ['SKU',        `VHX-${String(product.id).padStart(4, '0')}`],
-                [t('product.category'),  product.category],
-                [t('product.stock'),    `${product.stock} ${t('product.units')}`],
+                [
+                  'SKU',
+                  selectedVariant?.sku ||
+                    `VHX-${String(product.id).padStart(4, '0')}`,
+                ],
+                [
+                  t('product.category'),
+                  product.category,
+                ],
+                [
+                  t('product.stock'),
+                  `${displayedStock} ${t('product.units')}`,
+                ],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span className="text-white/30 tracking-wider">{label}</span>

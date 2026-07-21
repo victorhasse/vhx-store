@@ -63,6 +63,7 @@ function CheckoutForm({ items, totalPrice, address, setAddress, addressError, se
       */
      const checkoutItems = items.map(item => ({
         id: item.id,
+        variantId: item.variantId || null,
         quantity: item.quantity,
         selectedSize: item.selectedSize || null,
       }))
