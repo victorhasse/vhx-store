@@ -26,6 +26,14 @@ const EMPTY_VARIANT = {
   price_override: '',
 }
 
+const EMPTY_IMAGE = {
+    product_color_id: '',
+    image_url: '',
+    alt_text: '',
+    sort_order: '0',
+    is_primary: false,
+}
+
 export default function AdminProductOptions() {
   const { id } = useParams()
 
@@ -37,6 +45,9 @@ export default function AdminProductOptions() {
 
   const [variantForm, setVariantForm] =
     useState(EMPTY_VARIANT)
+
+  const [imageForm, setImageForm] =
+    useState(EMPTY_IMAGE)
 
   const [loading, setLoading] =
     useState(true)
@@ -223,6 +234,97 @@ async function handleDeleteVariant(variant) {
     setError(
       requestError.response?.data?.error ||
       'Não foi possível desativar a variante'
+    )
+  }
+}
+
+function handleImageChange(event) {
+  const {
+    name,
+    value,
+    type,
+    checked,
+  } = event.target
+
+  setImageForm(previous => ({
+    ...previous,
+    [name]:
+      type === 'checkbox' ? checked : value,
+  }))
+
+  setError('')
+}
+
+async function handleCreateImage(event) {
+  event.preventDefault()
+
+  if (!imageForm.image_url.trim()) {
+    setError('Informe a URL da imagem')
+    return
+  }
+
+  setSaving(true)
+  setError('')
+
+  try {
+    await productService.createImage(
+      id,
+      {
+        product_color_id:
+          imageForm.product_color_id
+            ? Number(
+                imageForm.product_color_id
+              )
+            : null,
+
+        image_url:
+          imageForm.image_url.trim(),
+
+        alt_text:
+          imageForm.alt_text.trim() ||
+          null,
+
+        sort_order: Number(
+          imageForm.sort_order
+        ),
+
+        is_primary:
+          imageForm.is_primary
+        }
+    )
+
+    setImageForm(EMPTY_IMAGE)
+    await loadProduct()
+  } catch (requestError) {
+    setError(
+      requestError.response?.data?.error ||
+      'Não foi possível adicionar a imagem'
+    )
+  } finally {
+    setSaving(false)
+  }
+}
+
+async function handleDeleteImage(image) {
+  const accepted = window.confirm(
+    `Remover esta imagem "${image.image_url}"?`
+  )
+
+  if (!accepted) return
+
+  setError('')
+
+  try {
+    await productService.deleteImage(
+      id,
+      image.id
+    )
+
+    await loadProduct()
+  } catch (requestError) {
+    setError(
+      requestError.response?.data?.error ||
+      'Não foi possível remover a imagem'
     )
   }
 }
@@ -593,6 +695,187 @@ async function handleDeleteVariant(variant) {
             </p>
           )}
         </section>
+
+        <section className="bg-[#111] border border-white/5 p-6 mt-6">
+  <div className="mb-6">
+    <h2
+      style={{
+        fontFamily:
+          '"Bebas Neue", sans-serif',
+      }}
+      className="text-3xl tracking-widest text-white"
+    >
+      Imagens
+    </h2>
+
+    <p className="text-white/30 text-xs mt-1">
+      Associe imagens gerais ou específicas para cada cor.
+    </p>
+  </div>
+
+  <form
+    onSubmit={handleCreateImage}
+    className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
+  >
+    <div>
+      <label className="block text-[10px] tracking-widest uppercase text-white/30 mb-2">
+        Cor
+      </label>
+
+      <select
+        name="product_color_id"
+        value={
+          imageForm.product_color_id
+        }
+        onChange={handleImageChange}
+        className="w-full h-12 bg-[#0a0a0a] border border-white/10 text-white/80 px-4 outline-none focus:border-[#C8F135]"
+      >
+        <option value="">
+          Imagem geral
+        </option>
+
+        {product.colors?.map(color => (
+          <option
+            key={color.id}
+            value={color.id}
+          >
+            {color.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label className="block text-[10px] tracking-widest uppercase text-white/30 mb-2">
+        URL da imagem *
+      </label>
+
+      <input
+        name="image_url"
+        value={imageForm.image_url}
+        onChange={handleImageChange}
+        placeholder="https://res.cloudinary.com/..."
+        className="w-full h-12 bg-[#0a0a0a] border border-white/10 text-white/80 px-4 outline-none focus:border-[#C8F135]"
+      />
+    </div>
+
+    <div>
+      <label className="block text-[10px] tracking-widest uppercase text-white/30 mb-2">
+        Texto alternativo
+      </label>
+
+      <input
+        name="alt_text"
+        value={imageForm.alt_text}
+        onChange={handleImageChange}
+        placeholder="Camiseta preta — frente"
+        className="w-full h-12 bg-[#0a0a0a] border border-white/10 text-white/80 px-4 outline-none focus:border-[#C8F135]"
+      />
+    </div>
+
+    <div>
+      <label className="block text-[10px] tracking-widest uppercase text-white/30 mb-2">
+        Ordem
+      </label>
+
+      <input
+        name="sort_order"
+        type="number"
+        min="0"
+        step="1"
+        value={imageForm.sort_order}
+        onChange={handleImageChange}
+        className="w-full h-12 bg-[#0a0a0a] border border-white/10 text-white/80 px-4 outline-none focus:border-[#C8F135]"
+      />
+    </div>
+
+    <label className="flex items-center gap-3 text-white/60 text-sm">
+      <input
+        name="is_primary"
+        type="checkbox"
+        checked={imageForm.is_primary}
+        onChange={handleImageChange}
+        className="accent-[#C8F135] w-4 h-4"
+      />
+
+      Definir como imagem principal
+    </label>
+
+    <div className="flex items-end">
+      <button
+        type="submit"
+        disabled={saving}
+        className="w-full h-12 bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase disabled:opacity-50"
+      >
+        {saving
+          ? 'Salvando...'
+          : 'Adicionar imagem'}
+      </button>
+    </div>
+  </form>
+
+  {product.images?.length > 0 ? (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {product.images.map(image => {
+        const imageColor =
+          product.colors?.find(
+            color =>
+              Number(color.id) ===
+              Number(
+                image.product_color_id
+              )
+          )
+
+        return (
+          <div
+            key={image.id}
+            className="flex gap-4 border border-white/5 bg-[#0d0d0d] p-3"
+          >
+            <img
+              src={image.image_url}
+              alt={
+                image.alt_text ||
+                product.name
+              }
+              className="w-24 h-24 object-cover bg-black"
+            />
+
+            <div className="flex-1 min-w-0">
+              <p className="text-white/80 text-sm">
+                {imageColor?.name ||
+                  'Imagem geral'}
+              </p>
+
+              <p className="text-white/30 text-xs mt-1">
+                Ordem: {image.sort_order}
+              </p>
+
+              {image.is_primary && (
+                <span className="inline-block mt-2 bg-[#C8F135] text-black text-[9px] font-bold tracking-widest uppercase px-2 py-1">
+                  Principal
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleDeleteImage(image)
+              }
+              className="self-start border border-red-500/20 text-red-400 px-3 py-2 text-[10px] tracking-widest uppercase hover:border-red-500/60"
+            >
+              Remover
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  ) : (
+    <p className="text-white/30 text-sm">
+      Nenhuma imagem adicional cadastrada.
+    </p>
+  )}
+</section>
       </div>
     </div>
   )
