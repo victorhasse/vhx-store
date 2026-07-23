@@ -209,14 +209,21 @@
     "category": "Categoria",
     "badge": "Badge",
     "image_url": "URL da imagem",
+    "shipping_dimensions": "Peso e dimensões para frete",
+    "weight": "Peso (kg)",
+    "width": "Largura (cm)",
+    "height": "Altura (cm)",
+    "length": "Comprimento (cm)",
+    "shipping_optional": "Campos opcionais. Quando preenchidos, devem ser maiores que zero.",
+    "error_shipping_measurements": "Peso e dimensões devem ser maiores que zero.",
     "error_save": "Erro ao salvar produto.",
     "error_all_fields": "Preencha nome, preço e categoria.",
     "categories_create": {
-        "camisetas": "Camisetas",
-        "calcas": "Calças",
-        "moletons": "Moletons",
-        "acessorios": "Acessórios",
-        "tenis": "Tênis"
+      "camisetas": "Camisetas",
+      "calcas": "Calças",
+      "moletons": "Moletons",
+      "acessorios": "Acessórios",
+      "tenis": "Tênis"
     }
   },
   "common": {

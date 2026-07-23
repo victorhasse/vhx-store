@@ -209,16 +209,23 @@
     "category": "Category",
     "badge": "Badge",
     "image_url": "Image URL",
+    "shipping_dimensions": "Shipping weight and dimensions",
+    "weight": "Weight (kg)",
+    "width": "Width (cm)",
+    "height": "Height (cm)",
+    "length": "Length (cm)",
+    "shipping_optional": "Optional fields. When provided, values must be greater than zero.",
+    "error_shipping_measurements": "Weight and dimensions must be greater than zero.",
     "error_save": "Error saving product.",
     "error_all_fields": "Please fill in name, price and category.",
     "categories_create": {
-        "camisetas": "T-Shirts",
-        "calcas": "Pants",
-        "moletons": "Hoodies",
-        "acessorios": "Accessories",
-        "tenis": "Sneakers"
+      "camisetas": "T-Shirts",
+      "calcas": "Pants",
+      "moletons": "Hoodies",
+      "acessorios": "Accessories",
+      "tenis": "Sneakers"
     }
-    },
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",
