@@ -81,7 +81,8 @@
     "free": "Grátis",
     "total": "Total",
     "checkout": "Finalizar pedido",
-    "keep_shopping": "Continuar comprando"
+    "keep_shopping": "Continuar comprando",
+    "calculated_at_checkout": "Calculado no checkout"
   },
   "checkout": {
     "title": "Checkout",

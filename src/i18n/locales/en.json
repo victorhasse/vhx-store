@@ -81,7 +81,8 @@
     "free": "Free",
     "total": "Total",
     "checkout": "Checkout",
-    "keep_shopping": "Keep shopping"
+    "keep_shopping": "Keep shopping",
+    "calculated_at_checkout": "Calculated at checkout"
   },
   "checkout": {
     "title": "Checkout",
