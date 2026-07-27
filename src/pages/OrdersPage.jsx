@@ -154,19 +154,48 @@ export default function OrdersPage() {
                     })}
                   </div>
 
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs text-white/30">
-                      {order.items?.length}{" "}
-                      {order.items?.length === 1
-                        ? t("orders.items")
-                        : t("orders.items_plural")}
-                    </p>
-                    <p
-                      style={{ fontFamily: '"Bebas Neue",sans-serif' }}
-                      className="text-xl tracking-wider text-[#C8F135]"
-                    >
-                      R$ {Number(order.total).toFixed(2).replace(".", ",")}
-                    </p>
+                  <div className="border-t border-white/5 pt-4">
+                    {Number(order.discount_amount || 0) > 0 && (
+                      <div className="mb-3 flex items-center justify-between text-xs">
+                        <span className="uppercase tracking-wider text-[#C8F135]">
+                          Cupom {order.coupon_code}
+                        </span>
+
+                        <span className="text-[#C8F135]">
+                          − R${" "}
+                          {Number(order.discount_amount)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-white/30">
+                        {order.items?.length}{" "}
+                        {order.items?.length === 1
+                          ? t("orders.items")
+                          : t("orders.items_plural")}
+                      </p>
+
+                      <div className="text-right">
+                        <p className="text-[9px] uppercase tracking-widest text-white/20">
+                          Total pago
+                        </p>
+
+                        <p
+                          style={{
+                            fontFamily: '"Bebas Neue",sans-serif',
+                          }}
+                          className="text-xl tracking-wider text-[#C8F135]"
+                        >
+                          R${" "}
+                          {Number(order.total || 0)
+                            .toFixed(2)
+                            .replace(".", ",")}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               );

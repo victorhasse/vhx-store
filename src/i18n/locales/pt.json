@@ -145,7 +145,8 @@
     "delivery": "Endereço de entrega",
     "see_orders": "Ver meus pedidos",
     "keep_shopping": "Continuar comprando",
-    "back": "Voltar"
+    "back": "Voltar",
+    "success": "foi realizado com sucesso."
   },
   "auth": {
     "login_title": "Entrar",

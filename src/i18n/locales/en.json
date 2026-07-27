@@ -145,7 +145,8 @@
     "delivery": "Delivery address",
     "see_orders": "View my orders",
     "keep_shopping": "Keep shopping",
-    "back": "Back"
+    "back": "Back",
+    "success": "was placed successfully."
   },
   "auth": {
     "login_title": "Sign in",

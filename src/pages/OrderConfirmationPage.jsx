@@ -168,14 +168,66 @@ export default function OrderConfirmPage() {
               );
             })}
           </div>
-          <div className="border-t border-white/5 mt-6 pt-4 flex justify-between">
-            <span className="text-sm text-white/40">Total</span>
-            <span
-              style={{ fontFamily: '"Bebas Neue",sans-serif' }}
-              className="text-2xl text-[#C8F135]"
-            >
-              R$ {Number(order.total).toFixed(2).replace(".", ",")}
-            </span>
+          <div className="mt-6 space-y-3 border-t border-white/5 pt-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-white/40">Subtotal</span>
+
+              <span className="text-white/70">
+                R${" "}
+                {Number(order.subtotal || 0)
+                  .toFixed(2)
+                  .replace(".", ",")}
+              </span>
+            </div>
+
+            {Number(order.discount_amount || 0) > 0 && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/40">
+                    Cupom
+                    {order.coupon_code && (
+                      <span className="ml-2 uppercase text-[#C8F135]">
+                        {order.coupon_code}
+                      </span>
+                    )}
+                  </span>
+
+                  <span className="text-[#C8F135]">
+                    − R${" "}
+                    {Number(order.discount_amount).toFixed(2).replace(".", ",")}
+                  </span>
+                </div>
+              </>
+            )}
+
+            <div className="flex justify-between text-sm">
+              <span className="text-white/40">Frete</span>
+
+              <span className="text-white/70">
+                R${" "}
+                {Number(order.shipping_price || 0)
+                  .toFixed(2)
+                  .replace(".", ",")}
+              </span>
+            </div>
+
+            <div className="flex items-baseline justify-between border-t border-white/5 pt-4">
+              <span className="text-sm tracking-wider text-white/40">
+                Total pago
+              </span>
+
+              <span
+                style={{
+                  fontFamily: '"Bebas Neue",sans-serif',
+                }}
+                className="text-2xl text-[#C8F135]"
+              >
+                R${" "}
+                {Number(order.total || 0)
+                  .toFixed(2)
+                  .replace(".", ",")}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -195,7 +247,7 @@ export default function OrderConfirmPage() {
               {address.city}
               {address.state && ` — ${address.state}`}
               <br />
-              {t('checkout.zipcode')}: {''}
+              {t("checkout.zipcode")}: {""}
               {address.zipcode || address.zip}
             </p>
           </div>

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { couponService } from "../services/couponService";
 import { paymentService } from "../services/paymentService";
 import { shippingService } from "../services/shippingService";
 
@@ -49,6 +50,14 @@ function CheckoutForm({
   shippingError,
   handleShippingQuote,
   setSelectedShipping,
+  couponCode,
+  setCouponCode,
+  appliedCoupon,
+  couponLoading,
+  couponError,
+  handleApplyCoupon,
+  handleRemoveCoupon,
+  displayTotal,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -121,6 +130,7 @@ function CheckoutForm({
         address,
         shippingServiceId: selectedShipping.id,
         destinationPostalCode: normalizedZipcode,
+        couponCode: appliedCoupon?.code || null,
       });
 
       const { clientSecret, orderId } = intentResponse.data;
@@ -394,6 +404,71 @@ function CheckoutForm({
         </div>
       </div>
 
+      {/* Cupom */}
+      <div className="pt-4">
+        <p
+          style={{
+            fontFamily: '"Bebas Neue",sans-serif',
+          }}
+          className="mb-4 text-2xl tracking-widest text-white"
+        >
+          Cupom de desconto
+        </p>
+
+        {appliedCoupon ? (
+          <div className="flex items-center justify-between border border-[#C8F135]/30 bg-[#C8F135]/5 px-4 py-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-white/30">
+                Cupom aplicado
+              </p>
+
+              <p className="mt-1 text-sm font-medium uppercase tracking-widest text-[#C8F135]">
+                {appliedCoupon.code}
+              </p>
+
+              <p className="mt-1 text-xs text-white/40">
+                Você economizou R${" "}
+                {formatCurrency(appliedCoupon.discountAmount)}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleRemoveCoupon}
+              className="text-[10px] uppercase tracking-widest text-red-400 transition-opacity hover:opacity-70"
+            >
+              Remover
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(event) => {
+                setCouponCode(event.target.value.toUpperCase());
+              }}
+              placeholder="Digite o código"
+              maxLength={50}
+              className="w-full border border-white/10 bg-[#111] px-4 py-3 text-sm uppercase tracking-widest text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#C8F135]"
+            />
+
+            <button
+              type="button"
+              onClick={handleApplyCoupon}
+              disabled={couponLoading || !couponCode.trim()}
+              className="border border-[#C8F135]/50 px-5 py-3 text-[11px] uppercase tracking-widest text-[#C8F135] transition-colors hover:bg-[#C8F135] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {couponLoading ? "Aplicando..." : "Aplicar"}
+            </button>
+          </div>
+        )}
+
+        {couponError && (
+          <p className="mt-2 text-xs text-red-400">{couponError}</p>
+        )}
+      </div>
+
       {/* Pagamento */}
       <div className="pt-4">
         <p
@@ -452,7 +527,7 @@ function CheckoutForm({
       >
         {loading
           ? t("checkout.processing")
-          : `${t("checkout.pay")} R$ ${formatCurrency(totalPrice)}`}
+          : `${t("checkout.pay")} R$ ${formatCurrency(displayTotal)}`}
       </button>
     </form>
   );
@@ -481,6 +556,64 @@ export default function CheckoutPage() {
   const [shippingLoading, setShippingLoading] = useState(false);
 
   const [shippingError, setShippingError] = useState("");
+
+  const [couponCode, setCouponCode] = useState("");
+
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const [couponError, setCouponError] = useState("");
+
+  async function handleApplyCoupon() {
+    const normalizedCode = couponCode.trim().toUpperCase();
+
+    if (!normalizedCode) {
+      setCouponError("Informe um código de cupom.");
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError("");
+
+    try {
+      const checkoutItems = items.map((item) => ({
+        productId: item.id,
+        variantId: item.variantId || null,
+        quantity: item.quantity,
+      }));
+
+      const response = await couponService.validate({
+        code: normalizedCode,
+        items: checkoutItems,
+      });
+
+      setAppliedCoupon({
+        code: response.data.code,
+        discountType: response.data.discountType,
+        discountValue: response.data.discountValue,
+        discountAmount: Number(response.data.discountAmount || 0),
+        subtotalAfterDiscount: Number(response.data.subtotalAfterDiscount || 0),
+      });
+
+      setCouponCode(response.data.code);
+    } catch (requestError) {
+      setAppliedCoupon(null);
+
+      setCouponError(
+        requestError.response?.data?.error ||
+          "Não foi possível aplicar o cupom.",
+      );
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+  }
 
   async function handleShippingQuote() {
     const normalizedZipcode = address.zipcode.replace(/\D/g, "");
@@ -529,7 +662,12 @@ export default function CheckoutPage() {
 
   const shippingPrice = Number(selectedShipping?.price || 0);
 
-  const displayTotal = Number(totalPrice) + shippingPrice;
+  const discountAmount = Number(appliedCoupon?.discountAmount || 0);
+
+  const displayTotal = Math.max(
+    0,
+    Number(totalPrice) - discountAmount + shippingPrice,
+  );
 
   if (!isAuthenticated) {
     return (
@@ -613,6 +751,14 @@ export default function CheckoutPage() {
                 shippingError={shippingError}
                 handleShippingQuote={handleShippingQuote}
                 setSelectedShipping={setSelectedShipping}
+                couponCode={couponCode}
+                setCouponCode={setCouponCode}
+                appliedCoupon={appliedCoupon}
+                couponLoading={couponLoading}
+                couponError={couponError}
+                handleApplyCoupon={handleApplyCoupon}
+                handleRemoveCoupon={handleRemoveCoupon}
+                displayTotal={displayTotal}
               />
             </Elements>
           </div>
@@ -656,6 +802,18 @@ export default function CheckoutPage() {
                     R$ {formatCurrency(totalPrice)}
                   </span>
                 </div>
+
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/40">
+                      Desconto ({appliedCoupon.code})
+                    </span>
+
+                    <span className="text-[#C8F135]">
+                      − R$ {formatCurrency(discountAmount)}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">Frete</span>
