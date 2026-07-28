@@ -49,7 +49,9 @@
     "clear_filters": "Clear filters",
     "add_cart": "+ Cart",
     "added": "✓ Added",
-    "last_units": "Last units"
+    "last_units": "Last units",
+    "unavailable": "Unavailable",
+    "options": "+ See Options"
   },
   "product": {
     "category": "Category",
@@ -235,6 +237,23 @@
       "acessorios": "Accessories",
       "tenis": "Sneakers"
     }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "add": "Add to wishlist",
+    "remove": "Remove from wishlist",
+    "save": "Save",
+    "saved": "Saved",
+    "empty": "Your wishlist is empty",
+    "empty_sub": "Save your favorite products so you can easily find them later.",
+    "explore": "Explore collection",
+    "loading": "Loading wishlist...",
+    "error": "Error loading wishlist.",
+    "retry": "Try again",
+    "view_product": "see product",
+    "count_zero": "No saved products",
+    "count_one": "{{count}} saved product",
+    "count_other": "{{count}} saved products"
   },
   "common": {
     "loading": "Loading...",

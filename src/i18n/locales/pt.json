@@ -49,7 +49,9 @@
     "clear_filters": "Limpar filtros",
     "add_cart": "+ Carrinho",
     "added": "✓ Adicionado",
-    "last_units": "Últimas"
+    "last_units": "Últimas",
+    "unavailable": "Indisponível",
+    "options": "+ Ver Opções"
   },
   "product": {
     "category": "Categoria",
@@ -235,6 +237,23 @@
       "acessorios": "Acessórios",
       "tenis": "Tênis"
     }
+  },
+  "wishlist": {
+    "title": "Lista de desejos",
+    "add": "Adicionar à lista de desejos",
+    "remove": "Remover da lista de desejos",
+    "save": "Favoritar",
+    "saved": "Salvo",
+    "empty": "Sua lista de desejos está vazia",
+    "empty_sub": "Salve seus produtos favoritos para encontrá-los facilmente depois.",
+    "explore": "Explorar coleção",
+    "loading": "Carregando lista de desejos...",
+    "error": "Erro ao carregar a lista de desejos.",
+    "retry": "Tentar novamente",
+    "view_product": "ver produto",
+    "count_zero": "Nenhum produto salvo",
+    "count_one": "{{count}} produto salvo",
+    "count_other": "{{count}} produtos salvos"
   },
   "common": {
     "loading": "Carregando...",

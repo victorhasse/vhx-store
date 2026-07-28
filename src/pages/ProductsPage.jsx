@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { useCart } from "../context/CartContext";
 
-import { useAuth } from "../context/AuthContext";
-
-import { useWishlist } from "../context/WishlistContext";
+import WishlistButton from "../components/ui/WishlistButton";
 
 import { productService } from "../services/productService";
 
@@ -39,13 +37,7 @@ function getProductImage(product) {
 
 function ProductCard({ product, index }) {
   const { addItem } = useCart();
-  const navigate = useNavigate();
 
-  const { isAuthenticated } = useAuth();
-
-  const { isInWishlist, toggleWishlist } = useWishlist();
-
-  const [wishlistBusy, setWishlistBusy] = useState(false);
   const [added, setAdded] = useState(false);
 
   const { ref, visible } = useScrollFadeIn();
@@ -71,30 +63,6 @@ function ProductCard({ product, index }) {
   const stock = getProductStock(product);
 
   const image = getProductImage(product);
-
-  const wished = isInWishlist(product.id);
-
-  async function handleWishlist() {
-    if (!isAuthenticated) {
-      navigate("/login", {
-        state: {
-          from: `/produtos/${product.id}`,
-        },
-      });
-
-      return;
-    }
-
-    if (wishlistBusy) {
-      return;
-    }
-
-    setWishlistBusy(true);
-
-    await toggleWishlist(product);
-
-    setWishlistBusy(false);
-  }
 
   function handleAdd() {
     if (requiresSelection) {
@@ -135,36 +103,10 @@ function ProductCard({ product, index }) {
           </span>
         )}
 
-        <button
-          type="button"
-          onClick={handleWishlist}
-          disabled={wishlistBusy}
-          aria-label={
-            wished
-              ? t("wishlist.remove", {
-                  defaultValue: "Remover da lista de desejos",
-                })
-              : t("wishlist.add", {
-                  defaultValue: "Adicionar à lista de desejos",
-                })
-          }
-          title={
-            wished
-              ? t("wishlist.remove", {
-                  defaultValue: "Remover da lista de desejos",
-                })
-              : t("wishlist.add", {
-                  defaultValue: "Adicionar à lista de desejos",
-                })
-          }
-          className={`absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border text-xl transition-all disabled:cursor-wait disabled:opacity-50 ${
-            wished
-              ? "border-[#C8F135] bg-[#C8F135] text-black"
-              : "border-white/20 bg-black/75 text-white hover:border-[#C8F135] hover:text-[#C8F135]"
-          }`}
-        >
-          <span aria-hidden="true">{wished ? "♥" : "♡"}</span>
-        </button>
+        <WishlistButton
+          product={product}
+          className="absolute right-3 top-3 z-10 h-10 w-10 rounded-full border"
+        />
 
         {stock > 0 && stock <= 3 && (
           <span className="absolute bottom-2 right-2 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-2 py-1 pointer-events-none">
@@ -207,7 +149,7 @@ function ProductCard({ product, index }) {
               to={`/produtos/${product.id}`}
               className="text-[10px] tracking-widest uppercase px-3 py-1.5 border border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135] transition-all"
             >
-              Ver opções
+              {t("products.options")}
             </Link>
           ) : (
             <button

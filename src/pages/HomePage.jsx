@@ -1,118 +1,186 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { productService } from '../services/productService'
-import { useCart } from '../context/CartContext'
-import { ProductCardSkeleton } from '../components/ui/Skeleton'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { productService } from "../services/productService";
+import { useCart } from "../context/CartContext";
+import { ProductCardSkeleton } from "../components/ui/Skeleton";
+import { useTranslation } from "react-i18next";
+import WishlistButton from "../components/ui/WishlistButton";
 
 const HERO_IMAGES = [
-  'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena1_pxymjz.png',
-  'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena2_lwx782.jpg',
-  'https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena3_zvkjdf.jpg',
-]
+  "https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena1_pxymjz.png",
+  "https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena2_lwx782.jpg",
+  "https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena3_zvkjdf.jpg",
+];
 
 function ProductCard({ product }) {
-  const { addItem } = useCart()
-  const [added, setAdded] = useState(false)
-  const { t } = useTranslation()
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+  const { t } = useTranslation();
 
   const CATEGORY_LABELS = {
-    camisetas:  t('products.shirts'),
-    calcas:     t('products.pants'),
-    moletons:   t('products.hoodies'),
-    acessorios: t('products.accessories'),
-    tenis:      t('products.sneakers'),
-}
+    camisetas: t("products.shirts"),
+    calcas: t("products.pants"),
+    moletons: t("products.hoodies"),
+    acessorios: t("products.accessories"),
+    tenis: t("products.sneakers"),
+  };
 
-  function handleAdd(e) {
-    e.preventDefault()
-    addItem(product)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
+  function handleAdd() {
+    addItem(product);
+    setAdded(true);
+
+    setTimeout(() => {
+      setAdded(false);
+    }, 1500);
   }
 
   return (
-    <Link to={`/produtos/${product.id}`} className="group block bg-[#111] rounded-sm overflow-hidden">
-      <div className="relative aspect-[3/4] bg-[#1a1a1a] overflow-hidden">
-        {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 text-white/10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-            </svg>
-          </div>
-        )}
+    <article className="group overflow-hidden rounded-sm bg-[#111]">
+      <div className="relative aspect-[3/4] overflow-hidden bg-[#1a1a1a]">
+        <Link to={`/produtos/${product.id}`} className="block h-full w-full">
+          {product.image_url ? (
+            <img
+              src={product.image_url}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 text-white/10"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+                />
+              </svg>
+            </div>
+          )}
+        </Link>
+
         {product.badge && (
-          <span className="absolute top-2 left-2 bg-[#C8F135] text-black text-[10px] font-bold tracking-widest uppercase px-2 py-1">
+          <span className="pointer-events-none absolute left-2 top-2 bg-[#C8F135] px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
             {product.badge}
           </span>
         )}
+
+        <WishlistButton
+          product={product}
+          className="absolute right-3 top-3 z-10 h-10 w-10 rounded-full border"
+        />
       </div>
+
       <div className="p-4">
-        <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">{CATEGORY_LABELS[product.category] || product.category}</p>
-        <h3 className="text-sm font-medium text-white/90 mb-3 group-hover:text-[#C8F135] transition-colors">{product.name}</h3>
+        <p className="mb-1 text-[10px] uppercase tracking-widest text-white/30">
+          {CATEGORY_LABELS[product.category] || product.category}
+        </p>
+
+        <Link to={`/produtos/${product.id}`} className="block">
+          <h3 className="mb-3 text-sm font-medium text-white/90 transition-colors group-hover:text-[#C8F135]">
+            {product.name}
+          </h3>
+        </Link>
+
         <div className="flex items-center justify-between gap-2">
-          <span style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-xl tracking-wider text-[#C8F135]">
-            R$ {Number(product.price).toFixed(2).replace('.', ',')}
+          <span
+            style={{
+              fontFamily: '"Bebas Neue",sans-serif',
+            }}
+            className="text-xl tracking-wider text-[#C8F135]"
+          >
+            R$ {Number(product.price).toFixed(2).replace(".", ",")}
           </span>
+
           <button
+            type="button"
             onClick={handleAdd}
-            className={`text-[10px] tracking-widest uppercase px-3 py-1.5 border transition-all duration-200 ${
-              added ? 'border-[#C8F135] text-[#C8F135]' : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
+            className={`border px-3 py-1.5 text-[10px] uppercase tracking-widest transition-all duration-200 ${
+              added
+                ? "border-[#C8F135] text-[#C8F135]"
+                : "border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]"
             }`}
           >
-            {added ? t('home.added') : t('home.add_cart')}
+            {added ? t("home.added") : t("home.add_cart")}
           </button>
         </div>
       </div>
-    </Link>
-  )
+    </article>
+  );
 }
 
 export default function HomePage() {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [heroIndex, setHeroIndex] = useState(0)
-  const { t } = useTranslation()
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    productService.getAll()
-      .then(res => setProducts(res.data.slice(0, 4)))
-      .finally(() => setLoading(false))
-  }, [])
+    productService
+      .getAll()
+      .then((res) => setProducts(res.data.slice(0, 4)))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setHeroIndex(prev => (prev + 1) % HERO_IMAGES.length)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [])
+      setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
-
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 pt-10 md:pt-16 pb-16 md:pb-24 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
         <div>
           <span className="inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase text-[#C8F135] mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C8F135] inline-block"></span>
-            {t('home.tag')}
+            {t("home.tag")}
           </span>
-          <h1 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-[56px] md:text-[88px] leading-[0.9] tracking-wide text-white mb-6">
-            {t('home.hero_title_1')}<br />{t('home.hero_title_2')}<br /><span className="text-[#C8F135]">{t('home.hero_title_3')}</span>
+          <h1
+            style={{ fontFamily: '"Bebas Neue",sans-serif' }}
+            className="text-[56px] md:text-[88px] leading-[0.9] tracking-wide text-white mb-6"
+          >
+            {t("home.hero_title_1")}
+            <br />
+            {t("home.hero_title_2")}
+            <br />
+            <span className="text-[#C8F135]">{t("home.hero_title_3")}</span>
           </h1>
           <p className="text-white/50 text-sm leading-relaxed max-w-sm mb-10">
-            {t('home.hero_sub')}
+            {t("home.hero_sub")}
           </p>
           <div className="flex items-center gap-4">
-            <Link to="/produtos" className="bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-90 transition-opacity">
-              {t('home.explore')}
+            <Link
+              to="/produtos"
+              className="bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-90 transition-opacity"
+            >
+              {t("home.explore")}
             </Link>
-            <Link to="/produtos" className="text-white/50 text-xs tracking-widest uppercase hover:text-white transition-colors flex items-center gap-2">
-              {t('home.drops')}
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            <Link
+              to="/produtos"
+              className="text-white/50 text-xs tracking-widest uppercase hover:text-white transition-colors flex items-center gap-2"
+            >
+              {t("home.drops")}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
               </svg>
             </Link>
           </div>
@@ -124,10 +192,14 @@ export default function HomePage() {
             <div
               key={i}
               className={`absolute inset-0 transition-opacity duration-1000 ${
-                i === heroIndex ? 'opacity-100' : 'opacity-0'
+                i === heroIndex ? "opacity-100" : "opacity-0"
               }`}
             >
-              <img src={img} alt={`VHX Model ${i + 1}`} className="w-full h-full object-cover" />
+              <img
+                src={img}
+                alt={`VHX Model ${i + 1}`}
+                className="w-full h-full object-cover"
+              />
             </div>
           ))}
 
@@ -138,7 +210,7 @@ export default function HomePage() {
                 key={i}
                 onClick={() => setHeroIndex(i)}
                 className={`w-6 h-0.5 transition-all duration-300 ${
-                  i === heroIndex ? 'bg-[#C8F135]' : 'bg-white/30'
+                  i === heroIndex ? "bg-[#C8F135]" : "bg-white/30"
                 }`}
               />
             ))}
@@ -146,19 +218,47 @@ export default function HomePage() {
 
           {/* Setas */}
           <button
-            onClick={() => setHeroIndex(prev => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
+            onClick={() =>
+              setHeroIndex(
+                (prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length,
+              )
+            }
             className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 transition-colors flex items-center justify-center z-10"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5L8.25 12l7.5-7.5"
+              />
             </svg>
           </button>
           <button
-            onClick={() => setHeroIndex(prev => (prev + 1) % HERO_IMAGES.length)}
+            onClick={() =>
+              setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length)
+            }
             className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 transition-colors flex items-center justify-center z-10"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.25 4.5l7.5 7.5-7.5 7.5"
+              />
             </svg>
           </button>
         </div>
@@ -168,17 +268,25 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: t('home.clothes_label'),     count: t('home.clothes_count')       },
-            { label: t('home.accessories_label'), count: t('home.accessories_count')   },
-            { label: t('home.news_label'),        count: t('home.news_count')          },
+            { label: t("home.clothes_label"), count: t("home.clothes_count") },
+            {
+              label: t("home.accessories_label"),
+              count: t("home.accessories_count"),
+            },
+            { label: t("home.news_label"), count: t("home.news_count") },
           ].map(({ label, count }) => (
             <Link
               key={label}
               to="/produtos"
               className="group relative h-24 md:h-32 bg-[#111] rounded-sm flex flex-col justify-end p-3 md:p-4 hover:bg-[#1a1a1a] transition-colors overflow-hidden"
             >
-              <p className="text-[9px] md:text-[10px] tracking-widest uppercase text-white/30 mb-1 truncate">{count}</p>
-              <p style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-sm md:text-2xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors leading-tight truncate">
+              <p className="text-[9px] md:text-[10px] tracking-widest uppercase text-white/30 mb-1 truncate">
+                {count}
+              </p>
+              <p
+                style={{ fontFamily: '"Bebas Neue",sans-serif' }}
+                className="text-sm md:text-2xl tracking-widest text-white group-hover:text-[#C8F135] transition-colors leading-tight truncate"
+              >
                 {label}
               </p>
             </Link>
@@ -189,9 +297,17 @@ export default function HomePage() {
       {/* PRODUTOS DESTAQUE */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="flex justify-between items-baseline mb-8">
-          <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl tracking-widest text-white">{t('home.highlights')}</h2>
-          <Link to="/produtos" className="text-[11px] tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity">
-            {t('home.see_all')}
+          <h2
+            style={{ fontFamily: '"Bebas Neue",sans-serif' }}
+            className="text-3xl tracking-widest text-white"
+          >
+            {t("home.highlights")}
+          </h2>
+          <Link
+            to="/produtos"
+            className="text-[11px] tracking-widest uppercase text-[#C8F135] hover:opacity-70 transition-opacity"
+          >
+            {t("home.see_all")}
           </Link>
         </div>
         {loading ? (
@@ -202,7 +318,9 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {products.map(p => <ProductCard key={p.id} product={p} />)}
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
         )}
       </section>
@@ -211,17 +329,26 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24">
         <div className="bg-[#C8F135] rounded-sm px-6 md:px-12 py-10 md:py-16 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-center md:text-left">
-            <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">{t('home.banner_tag')}</p>
-            <h2 style={{fontFamily:'"Bebas Neue",sans-serif'}} className="text-3xl md:text-5xl tracking-widest text-black">
-              {t('home.banner_title_1')}<br />{t('home.banner_title_2')}
+            <p className="text-[11px] tracking-widest uppercase text-black/50 mb-2">
+              {t("home.banner_tag")}
+            </p>
+            <h2
+              style={{ fontFamily: '"Bebas Neue",sans-serif' }}
+              className="text-3xl md:text-5xl tracking-widest text-black"
+            >
+              {t("home.banner_title_1")}
+              <br />
+              {t("home.banner_title_2")}
             </h2>
-        </div>
-          <Link to="/produtos" className="bg-black text-[#C8F135] text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-80 transition-opacity whitespace-nowrap">
-            {t('home.see_collection')}
+          </div>
+          <Link
+            to="/produtos"
+            className="bg-black text-[#C8F135] text-xs font-medium tracking-widest uppercase px-8 py-4 hover:opacity-80 transition-opacity whitespace-nowrap"
+          >
+            {t("home.see_collection")}
           </Link>
         </div>
       </section>
-
     </div>
-  )
+  );
 }

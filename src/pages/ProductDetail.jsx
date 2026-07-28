@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { productService } from "../services/productService";
 import { useTranslation } from "react-i18next";
+import WishlistButton from "../components/ui/WishlistButton";
 
 import {
   findSelectedVariant,
@@ -471,16 +472,32 @@ export default function ProductDetail() {
               </p>
             )}
             {/* Botão */}
-            <button
-              onClick={handleAdd}
-              className={`w-full py-4 text-sm font-medium tracking-widest uppercase transition-all duration-200 ${
-                added
-                  ? "bg-[#C8F135]/20 border border-[#C8F135] text-[#C8F135]"
-                  : "bg-[#C8F135] text-black hover:opacity-90 active:scale-95"
-              }`}
-            >
-              {added ? t("product.added") : t("product.add_cart")}
-            </button>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={displayedStock <= 0}
+                className={`min-h-14 px-6 py-4 text-sm font-medium uppercase tracking-widest transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 ${
+                  added
+                    ? "border border-[#C8F135] bg-[#C8F135]/20 text-[#C8F135]"
+                    : "bg-[#C8F135] text-black hover:opacity-90 active:scale-[0.99]"
+                }`}
+              >
+                {displayedStock <= 0
+                  ? t("products.unavailable", {
+                      defaultValue: "Indisponível",
+                    })
+                  : added
+                    ? t("product.added")
+                    : t("product.add_cart")}
+              </button>
+
+              <WishlistButton
+                product={product}
+                showLabel
+                className="min-h-14 border px-6 py-4"
+              />
+            </div>
 
             {/* Detalhes */}
             <div className="mt-10 pt-8 border-t border-white/5 space-y-3">
