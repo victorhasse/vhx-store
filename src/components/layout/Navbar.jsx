@@ -1,57 +1,68 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useCart } from '../../context/CartContext'
-import { useAuth } from '../../context/AuthContext'
-import logo from '../../assets/logo-transparente.png'
-import LanguageToggle from '../ui/LanguageToggle'
+import { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import logo from "../../assets/logo-transparente.png";
+import LanguageToggle from "../ui/LanguageToggle";
+import { useWishlist } from "../../context/WishlistContext";
 
 export default function Navbar() {
-  const { totalItems } = useCart()
-  const { isAuthenticated, logout } = useAuth()
-  const { t } = useTranslation()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const { totalItems } = useCart();
+  const { count: wishlistCount } = useWishlist();
+  const { isAuthenticated, logout } = useAuth();
+  const { t } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 50)
+      setScrolled(window.scrollY > 50);
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
-    { to: '/produtos',                label: t('nav.collection')   },
-    { to: '/produtos?cat=roupas',     label: t('nav.clothes')      },
-    { to: '/produtos?cat=acessorios', label: t('nav.accessories')  },
-  ]
+    { to: "/produtos", label: t("nav.collection") },
+    { to: "/produtos?cat=roupas", label: t("nav.clothes") },
+    { to: "/produtos?cat=acessorios", label: t("nav.accessories") },
+  ];
 
   return (
-    <header className={`sticky top-0 z-50 bg-brand-black border-b border-brand-border transition-all duration-300 ${scrolled ? 'shadow-lg shadow-black/40' : ''}`}>
-      <nav className={`max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-14' : 'h-20'}`}>
-
+    <header
+      className={`sticky top-0 z-50 bg-brand-black border-b border-brand-border transition-all duration-300 ${scrolled ? "shadow-lg shadow-black/40" : ""}`}
+    >
+      <nav
+        className={`max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-14" : "h-20"}`}
+      >
         {/* Logo */}
         <Link to="/" className="z-10 group flex-shrink-0">
           <div className="relative">
             <img
               src={logo}
               alt="VHX Store"
-              className={`w-auto transition-all duration-300 ${scrolled ? 'h-16' : 'h-30'}`}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-16" : "h-30"}`}
             />
             <img
               src={logo}
               alt=""
               aria-hidden="true"
               className="glitch-img-1 absolute inset-0 w-auto opacity-0"
-              style={{ height: scrolled ? '64px' : '120px', filter: 'hue-rotate(90deg) saturate(3)' }}
+              style={{
+                height: scrolled ? "64px" : "120px",
+                filter: "hue-rotate(90deg) saturate(3)",
+              }}
             />
             <img
               src={logo}
               alt=""
               aria-hidden="true"
               className="glitch-img-2 absolute inset-0 w-auto opacity-0"
-              style={{ height: scrolled ? '64px' : '120px', filter: 'hue-rotate(200deg) saturate(3)' }}
+              style={{
+                height: scrolled ? "64px" : "120px",
+                filter: "hue-rotate(200deg) saturate(3)",
+              }}
             />
           </div>
         </Link>
@@ -64,8 +75,8 @@ export default function Navbar() {
                 to={to}
                 className={({ isActive }) =>
                   `tracking-widest uppercase transition-all duration-300 ${
-                    scrolled ? 'text-[10px]' : 'text-xs'
-                  } ${isActive ? 'text-brand-lime' : 'text-brand-muted hover:text-brand-white'}`
+                    scrolled ? "text-[10px]" : "text-xs"
+                  } ${isActive ? "text-brand-lime" : "text-brand-muted hover:text-brand-white"}`
                 }
               >
                 {label}
@@ -76,42 +87,88 @@ export default function Navbar() {
 
         {/* Direita */}
         <div className="flex items-center gap-3">
-
           {/* Desktop auth + toggle */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
                 <Link
                   to="/perfil"
-                  className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}
+                  className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? "text-[10px]" : "text-xs"}`}
                 >
-                  {t('nav.profile')}
+                  {t("nav.profile")}
                 </Link>
                 <button
                   onClick={logout}
-                  className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}
+                  className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? "text-[10px]" : "text-xs"}`}
                 >
-                  {t('nav.logout')}
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
               <Link
                 to="/login"
-                className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? 'text-[10px]' : 'text-xs'}`}
+                className={`tracking-widest uppercase text-brand-muted hover:text-brand-white transition-all duration-300 ${scrolled ? "text-[10px]" : "text-xs"}`}
               >
-                {t('nav.login')}
+                {t("nav.login")}
               </Link>
             )}
           </div>
 
+          {/* Wishlist */}
+          {isAuthenticated && (
+            <Link
+              to="/wishlist"
+              aria-label={t("wishlist.title", {
+                defaultValue: "Lista de desejos",
+              })}
+              title={t("wishlist.title", {
+                defaultValue: "Lista de desejos",
+              })}
+              className="relative text-brand-muted hover:text-brand-lime transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`transition-all duration-300 ${
+                  scrolled ? "w-4 h-4" : "w-5 h-5"
+                }`}
+                viewBox="0 0 24 24"
+                fill={wishlistCount > 0 ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"
+                />
+              </svg>
+
+              {wishlistCount > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-lime px-1 text-[10px] font-bold text-brand-black">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {/* Carrinho */}
-          <Link to="/carrinho" className="relative text-brand-muted hover:text-brand-white transition-colors">
+          <Link
+            to="/carrinho"
+            className="relative text-brand-muted hover:text-brand-white transition-colors"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`transition-all duration-300 ${scrolled ? 'w-4 h-4' : 'w-5 h-5'}`}
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+              className={`transition-all duration-300 ${scrolled ? "w-4 h-4" : "w-5 h-5"}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              />
             </svg>
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-brand-lime text-brand-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -126,12 +183,34 @@ export default function Navbar() {
             className="md:hidden text-brand-muted hover:text-brand-white transition-colors"
           >
             {menuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
@@ -139,7 +218,9 @@ export default function Navbar() {
       </nav>
 
       {/* Menu mobile */}
-      <div className={`md:hidden bg-brand-black border-t border-brand-border overflow-hidden transition-all duration-300 ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div
+        className={`md:hidden bg-brand-black border-t border-brand-border overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+      >
         <div className="px-4 py-6 flex flex-col gap-5">
           {navLinks.map(({ to, label }) => (
             <Link
@@ -155,23 +236,53 @@ export default function Navbar() {
           <div className="border-t border-brand-border pt-4 flex flex-col gap-4">
             {isAuthenticated ? (
               <>
-                <Link to="/perfil" onClick={() => setMenuOpen(false)} className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors">
-                  {t('nav.profile')}
+                <Link
+                  to="/perfil"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+                >
+                  {t("nav.profile")}
                 </Link>
                 <button
-                  onClick={() => { logout(); setMenuOpen(false) }}
+                  onClick={() => {
+                    logout();
+                    setMenuOpen(false);
+                  }}
                   className="text-left text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
                 >
-                  {t('nav.logout')}
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors">
-                  {t('nav.login')}
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-between text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+                >
+                  <span>
+                    {t("wishlist.title", {
+                      defaultValue: "Lista de desejos",
+                    })}
+                  </span>
+
+                  {wishlistCount > 0 && (
+                    <span className="text-brand-lime">{wishlistCount}</span>
+                  )}
                 </Link>
-                <Link to="/cadastro" onClick={() => setMenuOpen(false)} className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors">
-                  {t('nav.register')}
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+                >
+                  {t("nav.login")}
+                </Link>
+                <Link
+                  to="/cadastro"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-sm tracking-widest uppercase text-brand-muted hover:text-brand-white transition-colors"
+                >
+                  {t("nav.register")}
                 </Link>
               </>
             )}
@@ -179,5 +290,5 @@ export default function Navbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

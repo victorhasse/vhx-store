@@ -1,188 +1,192 @@
-import {
-  useEffect,
-  useState,
-} from 'react'
+import { useEffect, useState } from "react";
 
-import {
-  Link,
-  useSearchParams,
-} from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import {
-  useCart,
-} from '../context/CartContext'
+import { useCart } from "../context/CartContext";
 
-import {
-  productService,
-} from '../services/productService'
+import { useAuth } from "../context/AuthContext";
 
-import {
-  ProductCardSkeleton,
-} from '../components/ui/Skeleton'
+import { useWishlist } from "../context/WishlistContext";
 
-import {
-  useScrollFadeIn,
-} from '../hooks/useFadeIn'
+import { productService } from "../services/productService";
 
-import {
-  useTranslation,
-} from 'react-i18next'
+import { ProductCardSkeleton } from "../components/ui/Skeleton";
+
+import { useScrollFadeIn } from "../hooks/useFadeIn";
+
+import { useTranslation } from "react-i18next";
 
 function getProductStock(product) {
-  const variants = Array.isArray(
-    product.variants
-  )
-    ? product.variants
-    : []
+  const variants = Array.isArray(product.variants) ? product.variants : [];
 
   if (variants.length > 0) {
     return variants.reduce(
-      (total, variant) =>
-        total +
-        Number(variant.stock || 0),
-      0
-    )
+      (total, variant) => total + Number(variant.stock || 0),
+      0,
+    );
   }
 
-  return Number(product.stock || 0)
+  return Number(product.stock || 0);
 }
 
 function getProductImage(product) {
-  const images = Array.isArray(
-    product.images
-  )
-    ? product.images
-    : []
+  const images = Array.isArray(product.images) ? product.images : [];
 
-  const image =
-    images.find(item =>
-      item.is_primary
-    ) ||
-    images[0]
+  const image = images.find((item) => item.is_primary) || images[0];
 
-  return (
-    product.image_url ||
-    image?.image_url ||
-    null
-  )
+  return product.image_url || image?.image_url || null;
 }
 
-function ProductCard({
-  product,
-  index,
-}) {
-  const { addItem } = useCart()
-  const [added, setAdded] =
-    useState(false)
+function ProductCard({ product, index }) {
+  const { addItem } = useCart();
+  const navigate = useNavigate();
 
-  const {
-    ref,
-    visible,
-  } = useScrollFadeIn()
+  const { isAuthenticated } = useAuth();
 
-  const { t } = useTranslation()
+  const { isInWishlist, toggleWishlist } = useWishlist();
+
+  const [wishlistBusy, setWishlistBusy] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const { ref, visible } = useScrollFadeIn();
+
+  const { t } = useTranslation();
 
   const categoryLabels = {
-    camisetas:
-      t('products.shirts'),
+    camisetas: t("products.shirts"),
 
-    calcas:
-      t('products.pants'),
+    calcas: t("products.pants"),
 
-    moletons:
-      t('products.hoodies'),
+    moletons: t("products.hoodies"),
 
-    acessorios:
-      t('products.accessories'),
+    acessorios: t("products.accessories"),
 
-    tenis:
-      t('products.sneakers'),
+    tenis: t("products.sneakers"),
+  };
+
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+
+  const requiresSelection = variants.length > 0;
+
+  const stock = getProductStock(product);
+
+  const image = getProductImage(product);
+
+  const wished = isInWishlist(product.id);
+
+  async function handleWishlist() {
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: {
+          from: `/produtos/${product.id}`,
+        },
+      });
+
+      return;
+    }
+
+    if (wishlistBusy) {
+      return;
+    }
+
+    setWishlistBusy(true);
+
+    await toggleWishlist(product);
+
+    setWishlistBusy(false);
   }
-
-  const variants = Array.isArray(
-    product.variants
-  )
-    ? product.variants
-    : []
-
-  const requiresSelection =
-    variants.length > 0
-
-  const stock =
-    getProductStock(product)
-
-  const image =
-    getProductImage(product)
 
   function handleAdd() {
     if (requiresSelection) {
-      return
+      return;
     }
 
-    addItem(product)
-    setAdded(true)
+    addItem(product);
+    setAdded(true);
 
-    setTimeout(
-      () => setAdded(false),
-      1500
-    )
+    setTimeout(() => setAdded(false), 1500);
   }
 
   return (
     <div
       ref={ref}
-      className={`fade-in stagger-${Math.min(
-        index + 1,
-        8
-      )} ${
-        visible ? 'visible' : ''
+      className={`fade-in stagger-${Math.min(index + 1, 8)} ${
+        visible ? "visible" : ""
       } group bg-[#111] rounded-sm overflow-hidden`}
     >
-      <Link
-        to={`/produtos/${product.id}`}
-        className="block relative aspect-[3/4] bg-[#1a1a1a] overflow-hidden"
-      >
-        {image ? (
-          <img
-            src={image}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white/10 text-sm">
-            VHX
-          </div>
-        )}
+      <div className="relative aspect-[3/4] bg-[#1a1a1a] overflow-hidden">
+        <Link to={`/produtos/${product.id}`} className="block h-full w-full">
+          {image ? (
+            <img
+              src={image}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white/10 text-sm">
+              VHX
+            </div>
+          )}
+        </Link>
 
         {product.badge && (
-          <span className="absolute top-2 left-2 bg-[#C8F135] text-black text-[10px] font-bold tracking-widest uppercase px-2 py-1">
+          <span className="absolute top-2 left-2 bg-[#C8F135] text-black text-[10px] font-bold tracking-widest uppercase px-2 py-1 pointer-events-none">
             {product.badge}
           </span>
         )}
 
+        <button
+          type="button"
+          onClick={handleWishlist}
+          disabled={wishlistBusy}
+          aria-label={
+            wished
+              ? t("wishlist.remove", {
+                  defaultValue: "Remover da lista de desejos",
+                })
+              : t("wishlist.add", {
+                  defaultValue: "Adicionar à lista de desejos",
+                })
+          }
+          title={
+            wished
+              ? t("wishlist.remove", {
+                  defaultValue: "Remover da lista de desejos",
+                })
+              : t("wishlist.add", {
+                  defaultValue: "Adicionar à lista de desejos",
+                })
+          }
+          className={`absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border text-xl transition-all disabled:cursor-wait disabled:opacity-50 ${
+            wished
+              ? "border-[#C8F135] bg-[#C8F135] text-black"
+              : "border-white/20 bg-black/75 text-white hover:border-[#C8F135] hover:text-[#C8F135]"
+          }`}
+        >
+          <span aria-hidden="true">{wished ? "♥" : "♡"}</span>
+        </button>
+
         {stock > 0 && stock <= 3 && (
-          <span className="absolute top-2 right-2 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-2 py-1">
-            {t('products.last_units')}
+          <span className="absolute bottom-2 right-2 bg-red-500/80 text-white text-[10px] tracking-widest uppercase px-2 py-1 pointer-events-none">
+            {t("products.last_units")}
           </span>
         )}
 
         {stock === 0 && (
-          <span className="absolute top-2 right-2 bg-black/80 text-white/60 text-[10px] tracking-widest uppercase px-2 py-1">
-            Indisponível
+          <span className="absolute bottom-2 right-2 bg-black/80 text-white/60 text-[10px] tracking-widest uppercase px-2 py-1 pointer-events-none">
+            {t("products.unavailable", {
+              defaultValue: "Indisponível",
+            })}
           </span>
         )}
-      </Link>
+      </div>
 
       <div className="p-4">
         <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">
-          {categoryLabels[
-            product.category
-          ] || product.category}
+          {categoryLabels[product.category] || product.category}
         </p>
 
-        <Link
-          to={`/produtos/${product.id}`}
-        >
+        <Link to={`/produtos/${product.id}`}>
           <h3 className="text-sm font-medium text-white/90 mb-3 group-hover:text-[#C8F135] transition-colors">
             {product.name}
           </h3>
@@ -191,15 +195,11 @@ function ProductCard({
         <div className="flex items-center justify-between gap-2">
           <span
             style={{
-              fontFamily:
-                '"Bebas Neue", sans-serif',
+              fontFamily: '"Bebas Neue", sans-serif',
             }}
             className="text-xl tracking-wider text-[#C8F135]"
           >
-            R${' '}
-            {Number(product.price)
-              .toFixed(2)
-              .replace('.', ',')}
+            R$ {Number(product.price).toFixed(2).replace(".", ",")}
           </span>
 
           {requiresSelection ? (
@@ -216,232 +216,161 @@ function ProductCard({
               disabled={stock === 0}
               className={`text-[10px] tracking-widest uppercase px-3 py-1.5 border transition-all ${
                 added
-                  ? 'border-[#C8F135] text-[#C8F135]'
-                  : 'border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]'
+                  ? "border-[#C8F135] text-[#C8F135]"
+                  : "border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]"
               } disabled:opacity-30 disabled:pointer-events-none`}
             >
-              {added
-                ? t('products.added')
-                : t(
-                    'products.add_cart'
-                  )}
+              {added ? t("products.added") : t("products.add_cart")}
             </button>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function ProductsPage() {
-  const [searchParams, setSearchParams] =
-    useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [products, setProducts] =
-    useState([])
+  const [products, setProducts] = useState([]);
 
-  const [filterOptions, setFilterOptions] =
-    useState({
-      colors: [],
-      sizes: [],
-    })
+  const [filterOptions, setFilterOptions] = useState({
+    colors: [],
+    sizes: [],
+  });
 
-  const [loading, setLoading] =
-    useState(true)
+  const [loading, setLoading] = useState(true);
 
-  const [error, setError] =
-    useState('')
+  const [error, setError] = useState("");
 
-  const [activeCategory, setActiveCategory] =
-    useState(
-      searchParams.get('category') || ''
-    )
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("category") || "",
+  );
 
-  const [search, setSearch] =
-    useState(
-      searchParams.get('search') || ''
-    )
+  const [search, setSearch] = useState(searchParams.get("search") || "");
 
-  const [color, setColor] =
-    useState(
-      searchParams.get('color') || ''
-    )
+  const [color, setColor] = useState(searchParams.get("color") || "");
 
-  const [size, setSize] =
-    useState(
-      searchParams.get('size') || ''
-    )
+  const [size, setSize] = useState(searchParams.get("size") || "");
 
-  const [minPrice, setMinPrice] =
-    useState(
-      searchParams.get('minPrice') || ''
-    )
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
 
-  const [maxPrice, setMaxPrice] =
-    useState(
-      searchParams.get('maxPrice') || ''
-    )
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
-  const {
-    ref: headerRef,
-    visible: headerVisible,
-  } = useScrollFadeIn()
+  const { ref: headerRef, visible: headerVisible } = useScrollFadeIn();
 
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const categories = [
     {
-      value: '',
-      label: t('products.all'),
+      value: "",
+      label: t("products.all"),
     },
     {
-      value: 'camisetas',
-      label: t('products.shirts'),
+      value: "camisetas",
+      label: t("products.shirts"),
     },
     {
-      value: 'calcas',
-      label: t('products.pants'),
+      value: "calcas",
+      label: t("products.pants"),
     },
     {
-      value: 'moletons',
-      label: t('products.hoodies'),
+      value: "moletons",
+      label: t("products.hoodies"),
     },
     {
-      value: 'acessorios',
-      label:
-        t('products.accessories'),
+      value: "acessorios",
+      label: t("products.accessories"),
     },
     {
-      value: 'tenis',
-      label: t('products.sneakers'),
+      value: "tenis",
+      label: t("products.sneakers"),
     },
-  ]
+  ];
 
   /*
    * Carrega as opções possíveis sem aplicar
    * os filtros escolhidos.
    */
   useEffect(() => {
-    let active = true
+    let active = true;
 
     productService
       .getAll()
-      .then(response => {
-        if (!active) return
+      .then((response) => {
+        if (!active) return;
 
-        const colorMap = new Map()
-        const sizeSet = new Set()
+        const colorMap = new Map();
+        const sizeSet = new Set();
 
-        response.data.forEach(product => {
-          product.colors?.forEach(
-            item => {
-              colorMap.set(
-                item.slug,
-                {
-                  slug: item.slug,
-                  name: item.name,
-                  hex_code:
-                    item.hex_code,
-                }
-              )
+        response.data.forEach((product) => {
+          product.colors?.forEach((item) => {
+            colorMap.set(item.slug, {
+              slug: item.slug,
+              name: item.name,
+              hex_code: item.hex_code,
+            });
+          });
+
+          product.variants?.forEach((variant) => {
+            if (variant.size && Number(variant.stock) > 0) {
+              sizeSet.add(String(variant.size));
             }
-          )
-
-          product.variants?.forEach(
-            variant => {
-              if (
-                variant.size &&
-                Number(
-                  variant.stock
-                ) > 0
-              ) {
-                sizeSet.add(
-                  String(variant.size)
-                )
-              }
-            }
-          )
-        })
+          });
+        });
 
         setFilterOptions({
-          colors: [
-            ...colorMap.values(),
-          ].sort((first, second) =>
-            first.name.localeCompare(
-              second.name,
-              'pt-BR'
-            )
+          colors: [...colorMap.values()].sort((first, second) =>
+            first.name.localeCompare(second.name, "pt-BR"),
           ),
 
-          sizes: [
-            ...sizeSet,
-          ].sort((first, second) =>
-            first.localeCompare(
-              second,
-              'pt-BR',
-              {
-                numeric: true,
-              }
-            )
+          sizes: [...sizeSet].sort((first, second) =>
+            first.localeCompare(second, "pt-BR", {
+              numeric: true,
+            }),
           ),
-        })
+        });
       })
-      .catch(() => {})
+      .catch(() => {});
 
     return () => {
-      active = false
-    }
-  }, [])
+      active = false;
+    };
+  }, []);
 
   /*
    * Mantém filtros compartilháveis na URL.
    */
   useEffect(() => {
-    const nextParams =
-      new URLSearchParams()
+    const nextParams = new URLSearchParams();
 
     if (activeCategory) {
-      nextParams.set(
-        'category',
-        activeCategory
-      )
+      nextParams.set("category", activeCategory);
     }
 
     if (search.trim()) {
-      nextParams.set(
-        'search',
-        search.trim()
-      )
+      nextParams.set("search", search.trim());
     }
 
     if (color) {
-      nextParams.set('color', color)
+      nextParams.set("color", color);
     }
 
     if (size) {
-      nextParams.set('size', size)
+      nextParams.set("size", size);
     }
 
-    if (minPrice !== '') {
-      nextParams.set(
-        'minPrice',
-        minPrice
-      )
+    if (minPrice !== "") {
+      nextParams.set("minPrice", minPrice);
     }
 
-    if (maxPrice !== '') {
-      nextParams.set(
-        'maxPrice',
-        maxPrice
-      )
+    if (maxPrice !== "") {
+      nextParams.set("maxPrice", maxPrice);
     }
 
-    setSearchParams(
-      nextParams,
-      {
-        replace: true,
-      }
-    )
+    setSearchParams(nextParams, {
+      replace: true,
+    });
   }, [
     activeCategory,
     search,
@@ -450,113 +379,77 @@ export default function ProductsPage() {
     minPrice,
     maxPrice,
     setSearchParams,
-  ])
+  ]);
 
   /*
    * Busca no servidor com pequeno debounce.
    */
   useEffect(() => {
-    let active = true
+    let active = true;
 
-    const timeoutId = setTimeout(
-      async () => {
-        const parsedMin =
-          minPrice === ''
-            ? null
-            : Number(minPrice)
+    const timeoutId = setTimeout(async () => {
+      const parsedMin = minPrice === "" ? null : Number(minPrice);
 
-        const parsedMax =
-          maxPrice === ''
-            ? null
-            : Number(maxPrice)
+      const parsedMax = maxPrice === "" ? null : Number(maxPrice);
 
-        if (
-          parsedMin !== null &&
-          parsedMax !== null &&
-          parsedMin > parsedMax
-        ) {
-          setProducts([])
-          setLoading(false)
-          setError(
-            'O preço mínimo não pode ser maior que o máximo'
-          )
-          return
+      if (parsedMin !== null && parsedMax !== null && parsedMin > parsedMax) {
+        setProducts([]);
+        setLoading(false);
+        setError("O preço mínimo não pode ser maior que o máximo");
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
+      try {
+        const params = {};
+
+        if (activeCategory) {
+          params.category = activeCategory;
         }
 
-        setLoading(true)
-        setError('')
-
-        try {
-          const params = {}
-
-          if (activeCategory) {
-            params.category =
-              activeCategory
-          }
-
-          if (search.trim()) {
-            params.search =
-              search.trim()
-          }
-
-          if (color) {
-            params.color = color
-          }
-
-          if (size) {
-            params.size = size
-          }
-
-          if (minPrice !== '') {
-            params.minPrice =
-              minPrice
-          }
-
-          if (maxPrice !== '') {
-            params.maxPrice =
-              maxPrice
-          }
-
-          const response =
-            await productService.getAll(
-              params
-            )
-
-          if (active) {
-            setProducts(
-              response.data
-            )
-          }
-        } catch (requestError) {
-          if (active) {
-            setError(
-              requestError.response
-                ?.data?.error ||
-              t('products.error')
-            )
-          }
-        } finally {
-          if (active) {
-            setLoading(false)
-          }
+        if (search.trim()) {
+          params.search = search.trim();
         }
-      },
-      350
-    )
+
+        if (color) {
+          params.color = color;
+        }
+
+        if (size) {
+          params.size = size;
+        }
+
+        if (minPrice !== "") {
+          params.minPrice = minPrice;
+        }
+
+        if (maxPrice !== "") {
+          params.maxPrice = maxPrice;
+        }
+
+        const response = await productService.getAll(params);
+
+        if (active) {
+          setProducts(response.data);
+        }
+      } catch (requestError) {
+        if (active) {
+          setError(requestError.response?.data?.error || t("products.error"));
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }, 350);
 
     return () => {
-      active = false
-      clearTimeout(timeoutId)
-    }
-  }, [
-    activeCategory,
-    search,
-    color,
-    size,
-    minPrice,
-    maxPrice,
-    t,
-  ])
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [activeCategory, search, color, size, minPrice, maxPrice, t]);
 
   const activeFilterCount = [
     activeCategory,
@@ -565,16 +458,16 @@ export default function ProductsPage() {
     size,
     minPrice,
     maxPrice,
-  ].filter(Boolean).length
+  ].filter(Boolean).length;
 
   function clearFilters() {
-    setActiveCategory('')
-    setSearch('')
-    setColor('')
-    setSize('')
-    setMinPrice('')
-    setMaxPrice('')
-    setError('')
+    setActiveCategory("");
+    setSearch("");
+    setColor("");
+    setSize("");
+    setMinPrice("");
+    setMaxPrice("");
+    setError("");
   }
 
   return (
@@ -582,11 +475,7 @@ export default function ProductsPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-16">
         <div
           ref={headerRef}
-          className={`fade-in ${
-            headerVisible
-              ? 'visible'
-              : ''
-          } mb-10`}
+          className={`fade-in ${headerVisible ? "visible" : ""} mb-10`}
         >
           <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-3">
             VHX Store
@@ -594,12 +483,11 @@ export default function ProductsPage() {
 
           <h1
             style={{
-              fontFamily:
-                '"Bebas Neue", sans-serif',
+              fontFamily: '"Bebas Neue", sans-serif',
             }}
             className="text-5xl md:text-6xl tracking-widest text-white mb-8"
           >
-            {t('products.title')}
+            {t("products.title")}
           </h1>
 
           <div className="relative max-w-2xl">
@@ -620,23 +508,15 @@ export default function ProductsPage() {
             <input
               type="search"
               value={search}
-              onChange={event =>
-                setSearch(
-                  event.target.value
-                )
-              }
-              placeholder={
-                t('products.search')
-              }
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t("products.search")}
               className="w-full h-14 bg-[#111] border border-white/10 text-white/80 pl-12 pr-12 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
             />
 
             {search && (
               <button
                 type="button"
-                onClick={() =>
-                  setSearch('')
-                }
+                onClick={() => setSearch("")}
                 aria-label="Limpar busca"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white"
               >
@@ -650,8 +530,7 @@ export default function ProductsPage() {
           <div className="flex items-center justify-between mb-5">
             <p className="text-xs tracking-widest uppercase text-white/50">
               Filtros
-              {activeFilterCount > 0 &&
-                ` · ${activeFilterCount}`}
+              {activeFilterCount > 0 && ` · ${activeFilterCount}`}
             </p>
 
             {activeFilterCount > 0 && (
@@ -666,20 +545,15 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex gap-2 flex-wrap mb-5">
-            {categories.map(category => (
+            {categories.map((category) => (
               <button
                 key={category.value}
                 type="button"
-                onClick={() =>
-                  setActiveCategory(
-                    category.value
-                  )
-                }
+                onClick={() => setActiveCategory(category.value)}
                 className={`text-[11px] tracking-widest uppercase px-4 py-2 border transition-all ${
-                  activeCategory ===
-                  category.value
-                    ? 'bg-[#C8F135] border-[#C8F135] text-black'
-                    : 'border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
+                  activeCategory === category.value
+                    ? "bg-[#C8F135] border-[#C8F135] text-black"
+                    : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/70"
                 }`}
               >
                 {category.label}
@@ -690,54 +564,32 @@ export default function ProductsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <select
               value={color}
-              onChange={event =>
-                setColor(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setColor(event.target.value)}
               aria-label="Filtrar por cor"
               className="h-12 bg-[#0a0a0a] border border-white/10 text-white/70 px-4 outline-none focus:border-[#C8F135]"
             >
-              <option value="">
-                Todas as cores
-              </option>
+              <option value="">Todas as cores</option>
 
-              {filterOptions.colors.map(
-                item => (
-                  <option
-                    key={item.slug}
-                    value={item.slug}
-                  >
-                    {item.name}
-                  </option>
-                )
-              )}
+              {filterOptions.colors.map((item) => (
+                <option key={item.slug} value={item.slug}>
+                  {item.name}
+                </option>
+              ))}
             </select>
 
             <select
               value={size}
-              onChange={event =>
-                setSize(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setSize(event.target.value)}
               aria-label="Filtrar por tamanho"
               className="h-12 bg-[#0a0a0a] border border-white/10 text-white/70 px-4 outline-none focus:border-[#C8F135]"
             >
-              <option value="">
-                Todos os tamanhos
-              </option>
+              <option value="">Todos os tamanhos</option>
 
-              {filterOptions.sizes.map(
-                item => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
-                    {item}
-                  </option>
-                )
-              )}
+              {filterOptions.sizes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
             </select>
 
             <input
@@ -745,11 +597,7 @@ export default function ProductsPage() {
               min="0"
               step="0.01"
               value={minPrice}
-              onChange={event =>
-                setMinPrice(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setMinPrice(event.target.value)}
               placeholder="Preço mínimo"
               className="h-12 bg-[#0a0a0a] border border-white/10 text-white/70 px-4 outline-none focus:border-[#C8F135] placeholder:text-white/20"
             />
@@ -759,11 +607,7 @@ export default function ProductsPage() {
               min="0"
               step="0.01"
               value={maxPrice}
-              onChange={event =>
-                setMaxPrice(
-                  event.target.value
-                )
-              }
+              onChange={(event) => setMaxPrice(event.target.value)}
               placeholder="Preço máximo"
               className="h-12 bg-[#0a0a0a] border border-white/10 text-white/70 px-4 outline-none focus:border-[#C8F135] placeholder:text-white/20"
             />
@@ -775,18 +619,14 @@ export default function ProductsPage() {
             {Array.from({
               length: 8,
             }).map((_, index) => (
-              <ProductCardSkeleton
-                key={index}
-              />
+              <ProductCardSkeleton key={index} />
             ))}
           </div>
         )}
 
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <p className="text-red-400 text-sm text-center">
-              {error}
-            </p>
+            <p className="text-red-400 text-sm text-center">{error}</p>
 
             <button
               type="button"
@@ -801,40 +641,31 @@ export default function ProductsPage() {
         {!loading && !error && (
           <>
             <p className="text-xs tracking-widest uppercase text-white/20 mb-6">
-              {products.length}{' '}
+              {products.length}{" "}
               {products.length === 1
-                ? t(
-                    'products.products_count'
-                  )
-                : t(
-                    'products.products_count_plural'
-                  )}
+                ? t("products.products_count")
+                : t("products.products_count_plural")}
             </p>
 
             {products.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {products.map(
-                  (product, index) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      index={index}
-                    />
-                  )
-                )}
+                {products.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    index={index}
+                  />
+                ))}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-24 gap-4">
                 <p
                   style={{
-                    fontFamily:
-                      '"Bebas Neue", sans-serif',
+                    fontFamily: '"Bebas Neue", sans-serif',
                   }}
                   className="text-4xl tracking-widest text-white/10"
                 >
-                  {t(
-                    'products.no_results'
-                  )}
+                  {t("products.no_results")}
                 </p>
 
                 <button
@@ -842,9 +673,7 @@ export default function ProductsPage() {
                   onClick={clearFilters}
                   className="text-xs tracking-widest uppercase text-[#C8F135]"
                 >
-                  {t(
-                    'products.clear_filters'
-                  )}
+                  {t("products.clear_filters")}
                 </button>
               </div>
             )}
@@ -852,5 +681,5 @@ export default function ProductsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

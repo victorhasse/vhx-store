@@ -22,105 +22,113 @@ import AdminProductOptions from "./pages/admin/AdminProductOptions";
 import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminCouponForm from "./pages/admin/AdminCouponForm";
 import AdminOrders from "./pages/admin/AdminOrders";
+import { WishlistProvider } from "./context/WishlistContext";
+import WishlistPage from "./pages/WishlistPage";
 
 export default function App() {
   return (
     <BrowserRouter basename="/vhx-store">
       <AuthProvider>
-        <CartProvider>
-          <div className="flex flex-col min-h-screen bg-brand-black">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/produtos" element={<ProductsPage />} />
-                <Route path="/produtos/:id" element={<ProductDetail />} />
-                <Route path="/carrinho" element={<CartPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/cadastro" element={<RegisterPage />} />
-                <Route path="/perfil" element={<ProfilePage />} />
-                <Route
-                  path="/admin/pedidos"
-                  element={
-                    <AdminRoute>
-                      <AdminOrders />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <AdminRoute>
-                      <AdminPage />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/produtos"
-                  element={
-                    <AdminRoute>
-                      <AdminProducts />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/produtos/novo"
-                  element={
-                    <AdminRoute>
-                      <AdminProductForm />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/produtos/:id/editar"
-                  element={
-                    <AdminRoute>
-                      <AdminProductForm />
-                    </AdminRoute>
-                  }
-                />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/pedido/:id" element={<OrderConfirmationPage />} />
-                <Route path="/pedidos" element={<OrdersPage />} />
-                <Route
-                  path="/admin/produtos/:id/opcoes"
-                  element={
-                    <AdminRoute>
-                      <AdminProductOptions />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/cupons"
-                  element={
-                    <AdminRoute>
-                      <AdminCoupons />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/cupons/novo"
-                  element={
-                    <AdminRoute>
-                      <AdminCouponForm />
-                    </AdminRoute>
-                  }
-                />
+        <WishlistProvider>
+          <CartProvider>
+            <div className="flex flex-col min-h-screen bg-brand-black">
+              <Navbar />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/produtos" element={<ProductsPage />} />
+                  <Route path="/produtos/:id" element={<ProductDetail />} />
+                  <Route path="/carrinho" element={<CartPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/cadastro" element={<RegisterPage />} />
+                  <Route path="/perfil" element={<ProfilePage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route
+                    path="/admin/pedidos"
+                    element={
+                      <AdminRoute>
+                        <AdminOrders />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <AdminRoute>
+                        <AdminPage />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/produtos"
+                    element={
+                      <AdminRoute>
+                        <AdminProducts />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/produtos/novo"
+                    element={
+                      <AdminRoute>
+                        <AdminProductForm />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/produtos/:id/editar"
+                    element={
+                      <AdminRoute>
+                        <AdminProductForm />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route
+                    path="/pedido/:id"
+                    element={<OrderConfirmationPage />}
+                  />
+                  <Route path="/pedidos" element={<OrdersPage />} />
+                  <Route
+                    path="/admin/produtos/:id/opcoes"
+                    element={
+                      <AdminRoute>
+                        <AdminProductOptions />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/cupons"
+                    element={
+                      <AdminRoute>
+                        <AdminCoupons />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/cupons/novo"
+                    element={
+                      <AdminRoute>
+                        <AdminCouponForm />
+                      </AdminRoute>
+                    }
+                  />
 
-                <Route
-                  path="/admin/cupons/:id/editar"
-                  element={
-                    <AdminRoute>
-                      <AdminCouponForm />
-                    </AdminRoute>
-                  }
-                />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </CartProvider>
+                  <Route
+                    path="/admin/cupons/:id/editar"
+                    element={
+                      <AdminRoute>
+                        <AdminCouponForm />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </CartProvider>
+        </WishlistProvider>
       </AuthProvider>
     </BrowserRouter>
   );
