@@ -21,6 +21,7 @@ import OrdersPage from "./pages/OrdersPage";
 import AdminProductOptions from "./pages/admin/AdminProductOptions";
 import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminCouponForm from "./pages/admin/AdminCouponForm";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 export default function App() {
   return (
@@ -38,7 +39,14 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/cadastro" element={<RegisterPage />} />
                 <Route path="/perfil" element={<ProfilePage />} />
-                <Route path="*" element={<NotFoundPage />} />
+                <Route
+                  path="/admin/pedidos"
+                  element={
+                    <AdminRoute>
+                      <AdminOrders />
+                    </AdminRoute>
+                  }
+                />
                 <Route
                   path="/admin"
                   element={
@@ -107,6 +115,7 @@ export default function App() {
                     </AdminRoute>
                   }
                 />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
             <Footer />

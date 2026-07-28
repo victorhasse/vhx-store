@@ -165,6 +165,40 @@ export default function AdminPage() {
               </svg>
             </Link>
           </div>
+          <Link
+            to="/admin/pedidos"
+            className="group flex items-center justify-between rounded-sm bg-[#111] p-6 transition-colors hover:bg-[#1a1a1a]"
+          >
+            <div>
+              <p
+                style={{
+                  fontFamily: '"Bebas Neue",sans-serif',
+                }}
+                className="mb-1 text-xl tracking-widest text-white transition-colors group-hover:text-[#C8F135]"
+              >
+                Pedidos
+              </p>
+
+              <p className="text-xs uppercase tracking-widest text-white/30">
+                Acompanhar pedidos e atualizar envios
+              </p>
+            </div>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white/20 transition-colors group-hover:text-[#C8F135]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+              />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>

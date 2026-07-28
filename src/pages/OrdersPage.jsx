@@ -5,6 +5,15 @@ import { orderService } from "../services/orderService";
 import { OrderCardSkeleton } from "../components/ui/Skeleton";
 import { useTranslation } from "react-i18next";
 
+function formatTrackingDate(value) {
+  if (!value) return "";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 export default function OrdersPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -95,9 +104,8 @@ export default function OrdersPage() {
             {orders.map((order) => {
               const status = STATUS_MAP[order.status] || STATUS_MAP.pending;
               return (
-                <Link
+                <article
                   key={order.id}
-                  to={`/pedido/${order.id}`}
                   className="block bg-[#111] rounded-sm p-6 hover:bg-[#1a1a1a] transition-colors group"
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -154,6 +162,60 @@ export default function OrdersPage() {
                     })}
                   </div>
 
+                  <div className="mb-4 border-t border-white/5 pt-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="mb-2 text-[10px] uppercase tracking-widest text-white/30">
+                          {t("orders.tracking")}
+                        </p>
+
+                        {order.tracking_code ? (
+                          <>
+                            <p className="text-sm text-white/70">
+                              {order.tracking_code}
+                            </p>
+
+                            {order.tracking_carrier && (
+                              <p className="mt-1 text-xs text-white/40">
+                                {t("orders.tracking_carrier")}:{" "}
+                                {order.tracking_carrier}
+                              </p>
+                            )}
+
+                            {order.shipped_at && (
+                              <p className="mt-1 text-xs text-white/30">
+                                {t("orders.shipped_at")}:{" "}
+                                {formatTrackingDate(order.shipped_at)}
+                              </p>
+                            )}
+
+                            {order.delivered_at && (
+                              <p className="mt-1 text-xs text-white/30">
+                                {t("orders.delivered_at")}:{" "}
+                                {formatTrackingDate(order.delivered_at)}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-xs text-white/30">
+                            {t("orders.tracking_unavailable")}
+                          </p>
+                        )}
+                      </div>
+
+                      {order.tracking_url && (
+                        <a
+                          href={order.tracking_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-[10px] uppercase tracking-widest text-[#C8F135] transition-opacity hover:opacity-70"
+                        >
+                          {t("orders.open_tracking")} ↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="border-t border-white/5 pt-4">
                     {Number(order.discount_amount || 0) > 0 && (
                       <div className="mb-3 flex items-center justify-between text-xs">
@@ -196,8 +258,14 @@ export default function OrdersPage() {
                         </p>
                       </div>
                     </div>
+                    <Link
+                      to={`/pedido/${order.id}`}
+                      className="mt-4 inline-flex text-[10px] uppercase tracking-widest text-white/30 transition-colors hover:text-[#C8F135]"
+                    >
+                      {t("orders.view_details")} →
+                    </Link>
                   </div>
-                </Link>
+                </article>
               );
             })}
           </div>

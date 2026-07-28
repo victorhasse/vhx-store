@@ -3,6 +3,15 @@ import { useParams, Link } from "react-router-dom";
 import { orderService } from "../services/orderService";
 import { useTranslation } from "react-i18next";
 
+function formatTrackingDate(value) {
+  if (!value) return "";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 export default function OrderConfirmPage() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -229,6 +238,77 @@ export default function OrderConfirmPage() {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Rastreamento */}
+        <div className="bg-[#111] rounded-sm p-6 mb-4">
+          <p
+            style={{
+              fontFamily: '"Bebas Neue",sans-serif',
+            }}
+            className="mb-4 text-xl tracking-widest text-white"
+          >
+            {t("orders.tracking")}
+          </p>
+
+          {order.tracking_code ? (
+            <div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-white/30">
+                    {t("orders.tracking_code")}
+                  </p>
+
+                  <p className="mt-1 text-sm text-white/80">
+                    {order.tracking_code}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-white/30">
+                    {t("orders.tracking_carrier")}
+                  </p>
+
+                  <p className="mt-1 text-sm text-white/80">
+                    {order.tracking_carrier || "—"}
+                  </p>
+                </div>
+              </div>
+
+              {(order.shipped_at || order.delivered_at) && (
+                <div className="mt-5 border-t border-white/5 pt-4 text-xs text-white/40">
+                  {order.shipped_at && (
+                    <p>
+                      {t("orders.shipped_at")}:{" "}
+                      {formatTrackingDate(order.shipped_at)}
+                    </p>
+                  )}
+
+                  {order.delivered_at && (
+                    <p className="mt-1">
+                      {t("orders.delivered_at")}:{" "}
+                      {formatTrackingDate(order.delivered_at)}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {order.tracking_url && (
+                <a
+                  href={order.tracking_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex bg-[#C8F135] px-5 py-3 text-xs font-medium uppercase tracking-widest text-black transition-opacity hover:opacity-90"
+                >
+                  {t("orders.open_tracking")} ↗
+                </a>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-white/30">
+              {t("orders.tracking_unavailable")}
+            </p>
+          )}
         </div>
 
         {/* Endereço */}

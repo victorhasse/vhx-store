@@ -134,7 +134,15 @@
     "shipped": "Enviado",
     "delivered": "Entregue",
     "cancelled": "Cancelado",
-    "not_found": "Pedido não encontrado"
+    "not_found": "Pedido não encontrado",
+    "tracking": "Rastreamento",
+    "tracking_code": "Código de rastreamento",
+    "tracking_carrier": "Transportadora",
+    "open_tracking": "Acompanhar entrega",
+    "tracking_unavailable": "O rastreamento ainda não está disponível.",
+    "shipped_at": "Enviado em",
+    "delivered_at": "Entregue em",
+    "view_details": "Ver detalhes"
   },
   "order_confirmation": {
     "title": "Pedido confirmado!",

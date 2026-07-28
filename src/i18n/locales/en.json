@@ -134,7 +134,15 @@
     "shipped": "Shipped",
     "delivered": "Delivered",
     "cancelled": "Cancelled",
-    "not_found": "Order not found"
+    "not_found": "Order not found",
+    "tracking": "Tracking",
+    "tracking_code": "Tracking code",
+    "tracking_carrier": "Carrier",
+    "open_tracking": "Track delivery",
+    "tracking_unavailable": "Tracking is not available yet.",
+    "shipped_at": "Shipped on",
+    "delivered_at": "Delivered on",
+    "view_details": "View details"
   },
   "order_confirmation": {
     "title": "Order confirmed!",
