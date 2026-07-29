@@ -123,6 +123,29 @@
     "error_login": "Erro ao entrar. Tente novamente.",
     "error_load_profile": "Erro ao carregar perfil."
   },
+  "cashback": {
+  "title": "VHX Cash",
+  "subtitle": "Seu saldo, créditos e movimentações",
+  "available": "Saldo disponível",
+  "pending": "Saldo pendente",
+  "expiring": "Expira em breve",
+  "expires_on": "Expira em {{date}}",
+  "statement": "Extrato",
+  "loading": "Carregando VHX Cash...",
+  "error_load": "Não foi possível carregar seu VHX Cash.",
+  "empty": "Você ainda não possui movimentações.",
+  "transaction_earned": "Crédito recebido",
+  "transaction_redeemed": "Saldo utilizado",
+  "transaction_reversed": "Saldo devolvido",
+  "transaction_adjustment": "Ajuste de saldo",
+  "transaction_expiration": "Crédito expirado",
+  "transaction_unknown": "Movimentação",
+  "order_number": "Pedido #{{id}}",
+  "valid_until": "Válido até {{date}}",
+  "previous": "Anterior",
+  "next": "Próxima",
+  "page": "Página {{current}} de {{total}}"
+},
   "orders": {
     "title": "Meus Pedidos",
     "back": "← Meu perfil",
@@ -260,6 +283,7 @@
     "error": "Erro",
     "back_store": "Voltar à loja",
     "not_found": "Página não encontrada",
+    "try_again": "Tentar novamente",
     "required": "*"
   }
 }

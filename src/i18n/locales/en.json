@@ -123,6 +123,29 @@
     "error_login": "Error signing in. Please try again.",
     "error_load_profile": "Error loading profile."
   },
+  "cashback": {
+    "title": "VHX Cash",
+    "subtitle": "Your balance, credits and transactions",
+    "available": "Available balance",
+    "pending": "Pending balance",
+    "expiring": "Expiring soon",
+    "expires_on": "Expires on {{date}}",
+    "statement": "Statement",
+    "loading": "Loading VHX Cash...",
+    "error_load": "Unable to load your VHX Cash.",
+    "empty": "You don't have any transactions yet.",
+    "transaction_earned": "Credit received",
+    "transaction_redeemed": "Balance used",
+    "transaction_reversed": "Balance returned",
+    "transaction_adjustment": "Balance adjustment",
+    "transaction_expiration": "Expired credit",
+    "transaction_unknown": "Transaction",
+    "order_number": "Order #{{id}}",
+    "valid_until": "Valid until {{date}}",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}"
+  },
   "orders": {
     "title": "My Orders",
     "back": "← My profile",
@@ -260,6 +283,7 @@
     "error": "Error",
     "back_store": "Back to store",
     "not_found": "Page not found",
+    "try_again": "Try again",
     "required": "*"
   }
 }

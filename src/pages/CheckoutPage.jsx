@@ -16,6 +16,8 @@ import { paymentService } from "../services/paymentService";
 import { shippingService } from "../services/shippingService";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const CASHBACK_RATE = 5;
+const CASHBACK_MINIMUM_ORDER_AMOUNT = 100;
 
 const CARD_STYLE = {
   style: {
@@ -35,6 +37,82 @@ const CARD_STYLE = {
 
 function formatCurrency(value) {
   return Number(value).toFixed(2).replace(".", ",");
+}
+
+function VhxCashCard({
+  appliedCoupon,
+  productsTotal,
+  eligibleAmount,
+  estimatedCashback,
+  hasPromotionalProducts,
+}) {
+  let message = "";
+
+  if (appliedCoupon) {
+    message = "Pedidos com cupom de desconto não acumulam VHX Cash.";
+  } else if (productsTotal < CASHBACK_MINIMUM_ORDER_AMOUNT) {
+    const missingAmount = CASHBACK_MINIMUM_ORDER_AMOUNT - productsTotal;
+
+    message = `Faltam R$ ${formatCurrency(
+      missingAmount,
+    )} em produtos para acumular VHX Cash.`;
+  } else if (eligibleAmount <= 0) {
+    message = "Os produtos deste pedido não são elegíveis para VHX Cash.";
+  } else {
+    message =
+      "O crédito será liberado após a entrega e terá validade de 30 dias.";
+  }
+
+  return (
+    <div className="mt-6 border border-[#C8F135]/25 bg-[#C8F135]/5 p-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#C8F135]">
+            VHX Cash
+          </p>
+
+          <p className="mt-1 text-xs leading-relaxed text-white/40">
+            Receba {CASHBACK_RATE}% de volta em produtos elegíveis.
+          </p>
+        </div>
+
+        <div className="text-right">
+          <p className="text-[9px] uppercase tracking-widest text-white/25">
+            Você receberá
+          </p>
+
+          <p
+            style={{
+              fontFamily: '"Bebas Neue",sans-serif',
+            }}
+            className="mt-1 text-2xl tracking-wider text-[#C8F135]"
+          >
+            R$ {formatCurrency(estimatedCashback)}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-3 border-t border-white/5 pt-3 text-[11px] leading-relaxed text-white/35">
+        {message}
+      </p>
+
+      {hasPromotionalProducts &&
+        !appliedCoupon &&
+        productsTotal >= CASHBACK_MINIMUM_ORDER_AMOUNT && (
+          <p className="mt-2 text-[10px] leading-relaxed text-white/25">
+            Produtos promocionais foram desconsiderados do cálculo.
+          </p>
+        )}
+
+      <button
+        type="button"
+        disabled
+        className="mt-4 w-full cursor-not-allowed border border-white/10 px-4 py-3 text-[10px] uppercase tracking-widest text-white/25"
+      >
+        Usar saldo VHX Cash — em breve
+      </button>
+    </div>
+  );
 }
 
 function CheckoutForm({
@@ -58,6 +136,9 @@ function CheckoutForm({
   handleApplyCoupon,
   handleRemoveCoupon,
   displayTotal,
+  cashbackEligibleAmount,
+  estimatedCashback,
+  hasPromotionalProducts,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -669,6 +750,24 @@ export default function CheckoutPage() {
     Number(totalPrice) - discountAmount + shippingPrice,
   );
 
+  const hasPromotionalProducts = items.some((item) =>
+    Boolean(item.is_promotional),
+  );
+
+  const cashbackEligibleAmount =
+    appliedCoupon || Number(totalPrice) < CASHBACK_MINIMUM_ORDER_AMOUNT
+      ? 0
+      : items.reduce((total, item) => {
+          if (item.is_promotional) {
+            return total;
+          }
+
+          return total + Number(item.price) * Number(item.quantity);
+        }, 0);
+
+  const estimatedCashback =
+    Math.round(cashbackEligibleAmount * CASHBACK_RATE) / 100;
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6">
@@ -759,6 +858,9 @@ export default function CheckoutPage() {
                 handleApplyCoupon={handleApplyCoupon}
                 handleRemoveCoupon={handleRemoveCoupon}
                 displayTotal={displayTotal}
+                cashbackEligibleAmount={cashbackEligibleAmount}
+                estimatedCashback={estimatedCashback}
+                hasPromotionalProducts={hasPromotionalProducts}
               />
             </Elements>
           </div>
@@ -849,6 +951,14 @@ export default function CheckoutPage() {
                   {selectedShipping.name}
                 </p>
               )}
+
+              <VhxCashCard
+                appliedCoupon={appliedCoupon}
+                productsTotal={Number(totalPrice)}
+                eligibleAmount={cashbackEligibleAmount}
+                estimatedCashback={estimatedCashback}
+                hasPromotionalProducts={hasPromotionalProducts}
+              />
             </div>
           </div>
         </div>
