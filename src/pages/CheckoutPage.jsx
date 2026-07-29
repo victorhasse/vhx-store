@@ -48,10 +48,10 @@ function VhxCashCard({
   hasPromotionalProducts,
   cashbackRedeemed,
 }) {
-  let message = "";
+  let message;
 
-  if (appliedCoupon) {
-    message = "Pedidos com cupom de desconto não acumulam VHX Cash.";
+  if (cashbackRedeemed > 0) {
+    message = "Pedidos que utilizam VHX Cash não acumulam novo VHX Cash.";
   } else if (productsTotal < CASHBACK_MINIMUM_ORDER_AMOUNT) {
     const missingAmount = CASHBACK_MINIMUM_ORDER_AMOUNT - productsTotal;
 
@@ -119,7 +119,6 @@ function VhxCashCard({
 
 function CheckoutForm({
   items,
-  totalPrice,
   address,
   setAddress,
   addressError,
@@ -138,9 +137,6 @@ function CheckoutForm({
   handleApplyCoupon,
   handleRemoveCoupon,
   displayTotal,
-  cashbackEligibleAmount,
-  estimatedCashback,
-  hasPromotionalProducts,
   cashbackAmount,
   cashbackBalance,
   cashbackInput,
@@ -728,8 +724,51 @@ export default function CheckoutPage() {
   const [cashbackBalance, setCashbackBalance] = useState(0);
   const [cashbackAmount, setCashbackAmount] = useState(0);
   const [cashbackInput, setCashbackInput] = useState("");
-  const [cashbackLoading, setCashbackLoading] = useState(true);
+  const [cashbackLoading, setCashbackLoading] = useState(false);
   const [cashbackError, setCashbackError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCashbackBalance() {
+      try {
+        setCashbackLoading(true);
+        setCashbackError("");
+
+        const response = await cashbackService.getBalance();
+
+        const availableBalance = Number(
+          response.data?.available ??
+            response.data?.availableBalance ??
+            response.data?.available_balance ??
+            0,
+        );
+
+        if (active) {
+          setCashbackBalance(
+            Number.isFinite(availableBalance)
+              ? Math.max(0, availableBalance)
+              : 0,
+          );
+        }
+      } catch {
+        if (active) {
+          setCashbackError("Não foi possível consultar seu saldo de VHX Cash.");
+        }
+      } finally {
+        if (active) {
+          setCashbackLoading(false);
+        }
+      }
+    }
+
+    if (isAuthenticated) {
+      loadCashbackBalance();
+    }
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated]);
 
   async function handleApplyCoupon() {
     const normalizedCode = couponCode.trim().toUpperCase();
@@ -936,51 +975,6 @@ export default function CheckoutPage() {
       </div>
     );
   }
-  useEffect(() => {
-    let active = true;
-
-    async function loadCashbackBalance() {
-      try {
-        setCashbackLoading(true);
-        setCashbackError("");
-
-        const response = await cashbackService.getBalance();
-
-        const availableBalance = Number(
-          response.data?.available ??
-            response.data?.availableBalance ??
-            response.data?.available_balance ??
-            0,
-        );
-
-        if (active) {
-          setCashbackBalance(
-            Number.isFinite(availableBalance)
-              ? Math.max(0, availableBalance)
-              : 0,
-          );
-        }
-      } catch {
-        if (active) {
-          setCashbackError("Não foi possível consultar seu saldo de VHX Cash.");
-        }
-      } finally {
-        if (active) {
-          setCashbackLoading(false);
-        }
-      }
-    }
-
-    if (isAuthenticated) {
-      loadCashbackBalance();
-    } else {
-      setCashbackLoading(false);
-    }
-
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated]);
 
   if (items.length === 0) {
     return (
@@ -1031,7 +1025,6 @@ export default function CheckoutPage() {
                  * O botão ainda apresenta somente o valor
                  * cobrado atualmente pelo backend.
                  */
-                totalPrice={totalPrice}
                 address={address}
                 setAddress={setAddress}
                 addressError={addressError}
@@ -1050,9 +1043,6 @@ export default function CheckoutPage() {
                 handleApplyCoupon={handleApplyCoupon}
                 handleRemoveCoupon={handleRemoveCoupon}
                 displayTotal={displayTotal}
-                cashbackEligibleAmount={cashbackEligibleAmount}
-                estimatedCashback={estimatedCashback}
-                hasPromotionalProducts={hasPromotionalProducts}
                 cashbackAmount={normalizedCashbackAmount}
                 cashbackBalance={cashbackBalance}
                 cashbackInput={cashbackInput}
