@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { couponService } from "../services/couponService";
 import { paymentService } from "../services/paymentService";
 import { shippingService } from "../services/shippingService";
+import { cashbackService } from "../services/cashbackService";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const CASHBACK_RATE = 5;
@@ -45,6 +46,7 @@ function VhxCashCard({
   eligibleAmount,
   estimatedCashback,
   hasPromotionalProducts,
+  cashbackRedeemed,
 }) {
   let message = "";
 
@@ -139,6 +141,17 @@ function CheckoutForm({
   cashbackEligibleAmount,
   estimatedCashback,
   hasPromotionalProducts,
+  cashbackAmount,
+  cashbackBalance,
+  cashbackInput,
+  setCashbackInput,
+  cashbackLoading,
+  cashbackError,
+  setCashbackError,
+  usableCashbackBalance,
+  handleApplyCashback,
+  handleUseAllCashback,
+  handleRemoveCashback,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -212,6 +225,7 @@ function CheckoutForm({
         shippingServiceId: selectedShipping.id,
         destinationPostalCode: normalizedZipcode,
         couponCode: appliedCoupon?.code || null,
+        cashbackAmount,
       });
 
       const { clientSecret, orderId } = intentResponse.data;
@@ -550,6 +564,80 @@ function CheckoutForm({
         )}
       </div>
 
+      <div className="border border-white/10 bg-[#111] p-5 rounded-sm">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div>
+            <p className="text-xs tracking-widest uppercase text-white">
+              Usar VHX Cash
+            </p>
+
+            <p className="text-[11px] text-white/40 mt-1">
+              Saldo disponível:{" "}
+              {cashbackLoading
+                ? "consultando..."
+                : `R$ ${formatCurrency(cashbackBalance)}`}
+            </p>
+          </div>
+
+          {cashbackAmount > 0 && (
+            <button
+              type="button"
+              onClick={handleRemoveCashback}
+              className="text-[10px] tracking-widest uppercase text-white/40 hover:text-white"
+            >
+              Remover
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={cashbackInput}
+            onChange={(event) => {
+              setCashbackInput(event.target.value);
+              setCashbackError("");
+            }}
+            disabled={cashbackLoading || usableCashbackBalance <= 0}
+            placeholder="0,00"
+            className="flex-1 bg-[#0a0a0a] border border-white/10 px-4 py-3 text-sm text-white outline-none focus:border-[#C8F135] disabled:opacity-40"
+          />
+
+          <button
+            type="button"
+            onClick={handleApplyCashback}
+            disabled={cashbackLoading || usableCashbackBalance <= 0}
+            className="bg-[#C8F135] px-5 py-3 text-[10px] font-medium tracking-widest uppercase text-black disabled:opacity-40"
+          >
+            Aplicar
+          </button>
+
+          <button
+            type="button"
+            onClick={handleUseAllCashback}
+            disabled={cashbackLoading || usableCashbackBalance <= 0}
+            className="border border-white/10 px-5 py-3 text-[10px] tracking-widest uppercase text-white hover:border-white/30 disabled:opacity-40"
+          >
+            Usar tudo
+          </button>
+        </div>
+
+        {cashbackError && (
+          <p className="text-xs text-red-400 mt-3">{cashbackError}</p>
+        )}
+
+        {!cashbackLoading && !cashbackError && usableCashbackBalance <= 0 && (
+          <p className="text-xs text-white/30 mt-3">
+            Você não possui saldo disponível para este pedido.
+          </p>
+        )}
+
+        <p className="text-[10px] text-white/25 mt-3">
+          O VHX Cash pode ser usado nos produtos, mas não no frete.
+        </p>
+      </div>
+
       {/* Pagamento */}
       <div className="pt-4">
         <p
@@ -629,22 +717,19 @@ export default function CheckoutPage() {
   });
 
   const [addressError, setAddressError] = useState("");
-
   const [shippingOptions, setShippingOptions] = useState([]);
-
   const [selectedShipping, setSelectedShipping] = useState(null);
-
   const [shippingLoading, setShippingLoading] = useState(false);
-
   const [shippingError, setShippingError] = useState("");
-
   const [couponCode, setCouponCode] = useState("");
-
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-
   const [couponLoading, setCouponLoading] = useState(false);
-
   const [couponError, setCouponError] = useState("");
+  const [cashbackBalance, setCashbackBalance] = useState(0);
+  const [cashbackAmount, setCashbackAmount] = useState(0);
+  const [cashbackInput, setCashbackInput] = useState("");
+  const [cashbackLoading, setCashbackLoading] = useState(true);
+  const [cashbackError, setCashbackError] = useState("");
 
   async function handleApplyCoupon() {
     const normalizedCode = couponCode.trim().toUpperCase();
@@ -745,9 +830,27 @@ export default function CheckoutPage() {
 
   const discountAmount = Number(appliedCoupon?.discountAmount || 0);
 
+  const maximumCashbackAmount = Math.max(
+    0,
+    Number(totalPrice) - discountAmount,
+  );
+
+  const usableCashbackBalance = Math.min(
+    cashbackBalance,
+    maximumCashbackAmount,
+  );
+
+  const normalizedCashbackAmount = Math.min(
+    Math.max(0, Number(cashbackAmount) || 0),
+    usableCashbackBalance,
+  );
+
   const displayTotal = Math.max(
     0,
-    Number(totalPrice) - discountAmount + shippingPrice,
+    Number(totalPrice) -
+      discountAmount -
+      normalizedCashbackAmount +
+      shippingPrice,
   );
 
   const hasPromotionalProducts = items.some((item) =>
@@ -755,7 +858,9 @@ export default function CheckoutPage() {
   );
 
   const cashbackEligibleAmount =
-    appliedCoupon || Number(totalPrice) < CASHBACK_MINIMUM_ORDER_AMOUNT
+    appliedCoupon ||
+    normalizedCashbackAmount > 0 ||
+    Number(totalPrice) < CASHBACK_MINIMUM_ORDER_AMOUNT
       ? 0
       : items.reduce((total, item) => {
           if (item.is_promotional) {
@@ -764,6 +869,48 @@ export default function CheckoutPage() {
 
           return total + Number(item.price) * Number(item.quantity);
         }, 0);
+
+  function handleApplyCashback() {
+    setCashbackError("");
+
+    const normalizedValue = Number(
+      String(cashbackInput).trim().replace(",", "."),
+    );
+
+    if (!Number.isFinite(normalizedValue) || normalizedValue < 0) {
+      setCashbackError("Informe um valor válido de VHX Cash.");
+      return;
+    }
+
+    const amountInCents = Math.round(normalizedValue * 100);
+    const maximumInCents = Math.round(usableCashbackBalance * 100);
+
+    if (amountInCents > maximumInCents) {
+      setCashbackError(
+        `Você pode utilizar no máximo R$ ${formatCurrency(
+          usableCashbackBalance,
+        )}.`,
+      );
+      return;
+    }
+
+    setCashbackAmount(amountInCents / 100);
+    setCashbackInput((amountInCents / 100).toFixed(2).replace(".", ","));
+  }
+
+  function handleUseAllCashback() {
+    const amount = Math.round(usableCashbackBalance * 100) / 100;
+
+    setCashbackError("");
+    setCashbackAmount(amount);
+    setCashbackInput(amount.toFixed(2).replace(".", ","));
+  }
+
+  function handleRemoveCashback() {
+    setCashbackAmount(0);
+    setCashbackInput("");
+    setCashbackError("");
+  }
 
   const estimatedCashback =
     Math.round(cashbackEligibleAmount * CASHBACK_RATE) / 100;
@@ -789,6 +936,51 @@ export default function CheckoutPage() {
       </div>
     );
   }
+  useEffect(() => {
+    let active = true;
+
+    async function loadCashbackBalance() {
+      try {
+        setCashbackLoading(true);
+        setCashbackError("");
+
+        const response = await cashbackService.getBalance();
+
+        const availableBalance = Number(
+          response.data?.available ??
+            response.data?.availableBalance ??
+            response.data?.available_balance ??
+            0,
+        );
+
+        if (active) {
+          setCashbackBalance(
+            Number.isFinite(availableBalance)
+              ? Math.max(0, availableBalance)
+              : 0,
+          );
+        }
+      } catch {
+        if (active) {
+          setCashbackError("Não foi possível consultar seu saldo de VHX Cash.");
+        }
+      } finally {
+        if (active) {
+          setCashbackLoading(false);
+        }
+      }
+    }
+
+    if (isAuthenticated) {
+      loadCashbackBalance();
+    } else {
+      setCashbackLoading(false);
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated]);
 
   if (items.length === 0) {
     return (
@@ -861,6 +1053,17 @@ export default function CheckoutPage() {
                 cashbackEligibleAmount={cashbackEligibleAmount}
                 estimatedCashback={estimatedCashback}
                 hasPromotionalProducts={hasPromotionalProducts}
+                cashbackAmount={normalizedCashbackAmount}
+                cashbackBalance={cashbackBalance}
+                cashbackInput={cashbackInput}
+                setCashbackInput={setCashbackInput}
+                cashbackLoading={cashbackLoading}
+                cashbackError={cashbackError}
+                setCashbackError={setCashbackError}
+                usableCashbackBalance={usableCashbackBalance}
+                handleApplyCashback={handleApplyCashback}
+                handleUseAllCashback={handleUseAllCashback}
+                handleRemoveCashback={handleRemoveCashback}
               />
             </Elements>
           </div>
@@ -917,6 +1120,16 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {normalizedCashbackAmount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/40">VHX Cash</span>
+
+                    <span className="text-[#C8F135]">
+                      − R$ {formatCurrency(normalizedCashbackAmount)}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">Frete</span>
 
@@ -952,12 +1165,19 @@ export default function CheckoutPage() {
                 </p>
               )}
 
+              {normalizedCashbackAmount > 0 && (
+                <p className="text-xs text-white/40 mt-3">
+                  Pedidos que utilizam VHX Cash não geram novo cashback.
+                </p>
+              )}
+
               <VhxCashCard
                 appliedCoupon={appliedCoupon}
                 productsTotal={Number(totalPrice)}
                 eligibleAmount={cashbackEligibleAmount}
                 estimatedCashback={estimatedCashback}
                 hasPromotionalProducts={hasPromotionalProducts}
+                cashbackRedeemed={normalizedCashbackAmount}
               />
             </div>
           </div>
