@@ -50,8 +50,10 @@ function VhxCashCard({
 }) {
   let message;
 
+  const { t } = useTranslation();
+
   if (cashbackRedeemed > 0) {
-    message = "Pedidos que utilizam VHX Cash não acumulam novo VHX Cash.";
+    message = (t("checkout.vhx_advice_amount"));
   } else if (productsTotal < CASHBACK_MINIMUM_ORDER_AMOUNT) {
     const missingAmount = CASHBACK_MINIMUM_ORDER_AMOUNT - productsTotal;
 
@@ -59,10 +61,10 @@ function VhxCashCard({
       missingAmount,
     )} em produtos para acumular VHX Cash.`;
   } else if (eligibleAmount <= 0) {
-    message = "Os produtos deste pedido não são elegíveis para VHX Cash.";
+    message = (t("checkout.vhx_item_not_valid"));
   } else {
     message =
-      "O crédito será liberado após a entrega e terá validade de 30 dias.";
+      (t("checkout.vhx_30days"));
   }
 
   return (
@@ -74,13 +76,13 @@ function VhxCashCard({
           </p>
 
           <p className="mt-1 text-xs leading-relaxed text-white/40">
-            Receba {CASHBACK_RATE}% de volta em produtos elegíveis.
+            {t("checkout.vhx_info", {rate: CASHBACK_RATE})}
           </p>
         </div>
 
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-widest text-white/25">
-            Você receberá
+            {t("checkout.will_earn")}
           </p>
 
           <p
@@ -102,7 +104,7 @@ function VhxCashCard({
         !appliedCoupon &&
         productsTotal >= CASHBACK_MINIMUM_ORDER_AMOUNT && (
           <p className="mt-2 text-[10px] leading-relaxed text-white/25">
-            Produtos promocionais foram desconsiderados do cálculo.
+            {t("checkout.excluded_items")}
           </p>
         )}
 
@@ -194,7 +196,7 @@ function CheckoutForm({
     }
 
     if (!selectedShipping) {
-      setError("Calcule o frete e selecione uma modalidade de entrega.");
+      setError(t("checkout.error_select_delivery"));
       return;
     }
 
@@ -229,7 +231,7 @@ function CheckoutForm({
       const cardElement = elements.getElement(CardElement);
 
       if (!cardElement) {
-        setError("Não foi possível acessar os dados do cartão.");
+        setError(t("checkout.error_credit_card"));
         return;
       }
 
@@ -321,7 +323,9 @@ function CheckoutForm({
             disabled={shippingLoading}
             className="border border-[#C8F135]/50 text-[#C8F135] text-[11px] tracking-widest uppercase px-5 py-3 hover:bg-[#C8F135] hover:text-black transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {shippingLoading ? "Calculando..." : "Calcular frete"}
+            {shippingLoading
+              ? t("checkout.calculating_shipping")
+              : t("checkout.calculate_shipping")}
           </button>
         </div>
 
@@ -334,7 +338,7 @@ function CheckoutForm({
       {shippingOptions.length > 0 && (
         <div className="space-y-2">
           <p className="text-[11px] tracking-widest uppercase text-white/30">
-            Escolha a entrega *
+            {t("checkout.choose_delivery")} *
           </p>
 
           {shippingOptions.map((option) => {
@@ -365,8 +369,13 @@ function CheckoutForm({
 
                   <p className="text-[11px] text-white/30 mt-1">
                     {minimumDays === maximumDays
-                      ? `Entrega em até ${maximumDays} dias úteis`
-                      : `Entrega entre ${minimumDays} e ${maximumDays} dias úteis`}
+                      ? t("checkout.shipping_estimate.exact_days", {
+                          count: maximumDays,
+                        })
+                      : t("checkout.shipping_estimate.range_days", {
+                          min: minimumDays,
+                          max: maximumDays,
+                        })}
                   </p>
                 </div>
 
@@ -390,7 +399,7 @@ function CheckoutForm({
             name="street"
             value={address.street}
             onChange={handleAddressChange}
-            placeholder="Nome da rua"
+            placeholder={t("checkout.street_name")}
             maxLength={80}
             className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
           />
@@ -428,7 +437,7 @@ function CheckoutForm({
             name="complement"
             value={address.complement}
             onChange={handleAddressChange}
-            placeholder="Apto, bloco..."
+            placeholder={t("checkout.complement_options")}
             maxLength={40}
             className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
           />
@@ -443,7 +452,7 @@ function CheckoutForm({
             name="neighborhood"
             value={address.neighborhood}
             onChange={handleAddressChange}
-            placeholder="Bairro"
+            placeholder={t("checkout.neighborhood")}
             maxLength={50}
             className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
           />
@@ -461,7 +470,7 @@ function CheckoutForm({
             name="city"
             value={address.city}
             onChange={handleAddressChange}
-            placeholder="Sua cidade"
+            placeholder={t("checkout.your_city")}
             maxLength={50}
             onInput={(event) => {
               event.target.value = event.target.value.replace(
@@ -503,14 +512,14 @@ function CheckoutForm({
           }}
           className="mb-4 text-2xl tracking-widest text-white"
         >
-          Cupom de desconto
+          {t("orders.discount_coupon")}
         </p>
 
         {appliedCoupon ? (
           <div className="flex items-center justify-between border border-[#C8F135]/30 bg-[#C8F135]/5 px-4 py-4">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-white/30">
-                Cupom aplicado
+                {t("orders.applied_coupon")}
               </p>
 
               <p className="mt-1 text-sm font-medium uppercase tracking-widest text-[#C8F135]">
@@ -518,7 +527,7 @@ function CheckoutForm({
               </p>
 
               <p className="mt-1 text-xs text-white/40">
-                Você economizou R${" "}
+                {t("orders.you_saved")} R${" "}
                 {formatCurrency(appliedCoupon.discountAmount)}
               </p>
             </div>
@@ -528,7 +537,7 @@ function CheckoutForm({
               onClick={handleRemoveCoupon}
               className="text-[10px] uppercase tracking-widest text-red-400 transition-opacity hover:opacity-70"
             >
-              Remover
+              {t("orders.remove")}
             </button>
           </div>
         ) : (
@@ -539,7 +548,7 @@ function CheckoutForm({
               onChange={(event) => {
                 setCouponCode(event.target.value.toUpperCase());
               }}
-              placeholder="Digite o código"
+              placeholder={t("orders.type_code")}
               maxLength={50}
               className="w-full border border-white/10 bg-[#111] px-4 py-3 text-sm uppercase tracking-widest text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#C8F135]"
             />
@@ -550,7 +559,7 @@ function CheckoutForm({
               disabled={couponLoading || !couponCode.trim()}
               className="border border-[#C8F135]/50 px-5 py-3 text-[11px] uppercase tracking-widest text-[#C8F135] transition-colors hover:bg-[#C8F135] hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {couponLoading ? "Aplicando..." : "Aplicar"}
+              {couponLoading ? t("orders.applying") : t("orders.apply")}
             </button>
           </div>
         )}
@@ -564,13 +573,13 @@ function CheckoutForm({
         <div className="flex items-center justify-between gap-4 mb-4">
           <div>
             <p className="text-xs tracking-widest uppercase text-white">
-              Usar VHX Cash
+              {t("cashback.use_vhx_cash")}
             </p>
 
             <p className="text-[11px] text-white/40 mt-1">
-              Saldo disponível:{" "}
+              {t("cashback.balance")}
               {cashbackLoading
-                ? "consultando..."
+                ? t("cashback.checking")
                 : `R$ ${formatCurrency(cashbackBalance)}`}
             </p>
           </div>
@@ -581,7 +590,7 @@ function CheckoutForm({
               onClick={handleRemoveCashback}
               className="text-[10px] tracking-widest uppercase text-white/40 hover:text-white"
             >
-              Remover
+              {t("cashback.remove")}
             </button>
           )}
         </div>
@@ -606,7 +615,7 @@ function CheckoutForm({
             disabled={cashbackLoading || usableCashbackBalance <= 0}
             className="bg-[#C8F135] px-5 py-3 text-[10px] font-medium tracking-widest uppercase text-black disabled:opacity-40"
           >
-            Aplicar
+            {t("cashback.apply")}
           </button>
 
           <button
@@ -615,7 +624,7 @@ function CheckoutForm({
             disabled={cashbackLoading || usableCashbackBalance <= 0}
             className="border border-white/10 px-5 py-3 text-[10px] tracking-widest uppercase text-white hover:border-white/30 disabled:opacity-40"
           >
-            Usar tudo
+            {t("cashback.use_all")}
           </button>
         </div>
 
@@ -625,12 +634,12 @@ function CheckoutForm({
 
         {!cashbackLoading && !cashbackError && usableCashbackBalance <= 0 && (
           <p className="text-xs text-white/30 mt-3">
-            Você não possui saldo disponível para este pedido.
+            {t("cashback.balance_unavailable")}
           </p>
         )}
 
         <p className="text-[10px] text-white/25 mt-3">
-          O VHX Cash pode ser usado nos produtos, mas não no frete.
+          {t("cashback.balance_advice")}
         </p>
       </div>
 
@@ -701,6 +710,7 @@ function CheckoutForm({
 export default function CheckoutPage() {
   const { items, totalPrice } = useCart();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   const [address, setAddress] = useState({
     street: "",
@@ -753,7 +763,7 @@ export default function CheckoutPage() {
         }
       } catch {
         if (active) {
-          setCashbackError("Não foi possível consultar seu saldo de VHX Cash.");
+          setCashbackError(t("checkout.check_balance"));
         }
       } finally {
         if (active) {
@@ -774,7 +784,7 @@ export default function CheckoutPage() {
     const normalizedCode = couponCode.trim().toUpperCase();
 
     if (!normalizedCode) {
-      setCouponError("Informe um código de cupom.");
+      setCouponError(t("checkout.write_code"));
       return;
     }
 
@@ -806,8 +816,7 @@ export default function CheckoutPage() {
       setAppliedCoupon(null);
 
       setCouponError(
-        requestError.response?.data?.error ||
-          "Não foi possível aplicar o cupom.",
+        requestError.response?.data?.error || t("checkout.error_apply_code"),
       );
     } finally {
       setCouponLoading(false);
@@ -824,7 +833,7 @@ export default function CheckoutPage() {
     const normalizedZipcode = address.zipcode.replace(/\D/g, "");
 
     if (normalizedZipcode.length !== 8) {
-      setShippingError("Informe um CEP válido para calcular o frete.");
+      setShippingError(t("checkout.write_valid_cep"));
       return;
     }
 
@@ -850,15 +859,13 @@ export default function CheckoutPage() {
       setShippingOptions(options);
 
       if (options.length === 0) {
-        setShippingError(
-          "Nenhuma modalidade de entrega foi encontrada para este CEP.",
-        );
+        setShippingError(t("checkout.error_valid_shipping"));
       }
     } catch (requestError) {
       setShippingError(
         requestError.response?.data?.message ||
           requestError.response?.data?.error ||
-          "Não foi possível calcular o frete.",
+          t("checkout.error_calculate_shipping"),
       );
     } finally {
       setShippingLoading(false);
@@ -917,7 +924,7 @@ export default function CheckoutPage() {
     );
 
     if (!Number.isFinite(normalizedValue) || normalizedValue < 0) {
-      setCashbackError("Informe um valor válido de VHX Cash.");
+      setCashbackError(t("checkout.valid_vhx_value"));
       return;
     }
 
@@ -926,7 +933,7 @@ export default function CheckoutPage() {
 
     if (amountInCents > maximumInCents) {
       setCashbackError(
-        `Você pode utilizar no máximo R$ ${formatCurrency(
+        `${t("checkout.max_vhx_value")} R$ ${formatCurrency(
           usableCashbackBalance,
         )}.`,
       );
@@ -963,14 +970,14 @@ export default function CheckoutPage() {
           }}
           className="text-4xl tracking-widest text-white/10"
         >
-          Faça login para continuar
+          {t("checkout.login_to_continue")}
         </p>
 
         <Link
           to="/login"
           className="bg-[#C8F135] text-black text-xs font-medium tracking-widest uppercase px-8 py-4"
         >
-          Entrar
+          {t("checkout.login")}
         </Link>
       </div>
     );
@@ -985,14 +992,14 @@ export default function CheckoutPage() {
           }}
           className="text-5xl tracking-widest text-white/10"
         >
-          Carrinho vazio
+          {t("checkout.empty_cart")}
         </p>
 
         <Link
           to="/produtos"
           className="text-xs tracking-widest uppercase text-[#C8F135] hover:opacity-70"
         >
-          Explorar coleção
+          {t("checkout.explore")}
         </Link>
       </div>
     );
@@ -1067,7 +1074,7 @@ export default function CheckoutPage() {
                 }}
                 className="text-2xl tracking-widest text-white mb-6"
               >
-                Resumo
+                {t("checkout.order_summary")}
               </p>
 
               <div className="space-y-3 mb-6">
@@ -1101,7 +1108,7 @@ export default function CheckoutPage() {
                 {appliedCoupon && (
                   <div className="flex justify-between text-sm">
                     <span className="text-white/40">
-                      Desconto ({appliedCoupon.code})
+                      {t("checkout.discount")} ({appliedCoupon.code})
                     </span>
 
                     <span className="text-[#C8F135]">
@@ -1121,12 +1128,12 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">Frete</span>
+                  <span className="text-white/40">{t("checkout.shipping")}</span>
 
                   <span className="text-white/70">
                     {selectedShipping
                       ? `R$ ${formatCurrency(shippingPrice)}`
-                      : "A calcular"}
+                      : (t("checkout.tbc"))}
                   </span>
                 </div>
 
@@ -1157,7 +1164,7 @@ export default function CheckoutPage() {
 
               {normalizedCashbackAmount > 0 && (
                 <p className="text-xs text-white/40 mt-3">
-                  Pedidos que utilizam VHX Cash não geram novo cashback.
+                  {t("checkout.vhx_advice")}
                 </p>
               )}
 
