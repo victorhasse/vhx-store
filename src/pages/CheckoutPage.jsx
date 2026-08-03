@@ -113,7 +113,7 @@ function VhxCashCard({
         disabled
         className="mt-4 w-full cursor-not-allowed border border-white/10 px-4 py-3 text-[10px] uppercase tracking-widest text-white/25"
       >
-        Usar saldo VHX Cash — em breve
+        {t("checkout.vhx_use_balance")}
       </button>
     </div>
   );
