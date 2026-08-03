@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { productService } from "../../services/productService";
+import { t } from "i18next";
 
 const EMPTY_COLOR = {
   name: "",

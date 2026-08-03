@@ -7,6 +7,9 @@ export const productService = {
   getById: id =>
     api.get(`/products/${id}`),
 
+  getRecommendations: id =>
+    api.get(`/products/${id}/recommendations`),
+
   create: data =>
     api.post('/products', data),
 

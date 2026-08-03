@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import { productService } from "../services/productService";
 import { useTranslation } from "react-i18next";
 import WishlistButton from "../components/ui/WishlistButton";
+import ProductCard from "../components/products/ProductCard";
 
 import {
   findSelectedVariant,
@@ -37,6 +38,7 @@ export default function ProductDetail() {
   };
 
   const [product, setProduct] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -59,6 +61,36 @@ export default function ProductDetail() {
       })
       .catch(() => setError(t("product.not_found")))
       .finally(() => setLoading(false));
+  }, [id, t]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+
+    setRecommendations([]);
+
+    productService
+      .getRecommendations(id)
+      .then((res) => {
+        if (!isCurrentRequest) {
+          return;
+        }
+
+        setRecommendations(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => {
+        if (isCurrentRequest) {
+          setRecommendations([]);
+        }
+      });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    return () => {
+      isCurrentRequest = false;
+    };
   }, [id, t]);
   const colors = getProductColors(product);
   const variants = getProductVariants(product);
@@ -518,7 +550,38 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+        {recommendations.length > 0 && (
+          <section className="mt-20 pt-12 border-t border-white/5">
+            <div className="mb-8">
+              <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-2">
+                {t("product.recommendations_label", {
+                  defaultValue: "Recomendações",
+                })}
+              </p>
 
+              <h2
+                style={{
+                  fontFamily: '"Bebas Neue", sans-serif',
+                }}
+                className="text-3xl tracking-widest text-white"
+              >
+                {t("product.recommendations_title", {
+                  defaultValue: "Você também pode gostar",
+                })}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {recommendations.map((recommendedProduct, index) => (
+                <ProductCard
+                  key={recommendedProduct.id}
+                  product={recommendedProduct}
+                  index={index}
+                />
+              ))}
+            </div>
+          </section>
+        )}
         <div className="mt-20 pt-8 border-t border-white/5">
           <Link
             to="/produtos"

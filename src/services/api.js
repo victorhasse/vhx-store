@@ -1,26 +1,33 @@
-import axios from 'axios'
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3333/api',
-  headers: { 'Content-Type': 'application/json' },
-})
+  baseURL: import.meta.env.DEV
+    ? "http://localhost:3333/api"
+    : import.meta.env.VITE_API_URL || "https://vhx-api.onrender.com/api",
+  headers: { "Content-Type": "application/json" },
+});
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('vhx_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+  const token = localStorage.getItem("vhx_token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('vhx_token')
-      localStorage.removeItem('vhx_user')
-      window.location.href = '/login'
+      localStorage.removeItem("vhx_token");
+      localStorage.removeItem("vhx_user");
+      window.location.href = "/login";
     }
-    return Promise.reject(error)
-  }
-)
 
-export default api
+    return Promise.reject(error);
+  },
+);
+
+export default api;
