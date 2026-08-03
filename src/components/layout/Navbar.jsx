@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import logo from "../../assets/logo-transparente.png";
-import LanguageToggle from "../ui/LanguageToggle";
 import { useWishlist } from "../../context/WishlistContext";
 
 export default function Navbar() {

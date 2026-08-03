@@ -26,13 +26,12 @@ export default function AdminProductForm() {
   const { t } = useTranslation();
 
   const [form, setForm] = useState(EMPTY);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isEditing) return;
-    setLoading(true);
     productService
       .getById(id)
       .then((res) =>
@@ -52,7 +51,7 @@ export default function AdminProductForm() {
       )
       .catch(() => setError(t("products.error")))
       .finally(() => setLoading(false));
-  }, [id, isEditing]);
+  }, [id, isEditing, t]);
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));

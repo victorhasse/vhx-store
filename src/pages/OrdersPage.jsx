@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { orderService } from "../services/orderService";
 import { OrderCardSkeleton } from "../components/ui/Skeleton";
 import { useTranslation } from "react-i18next";

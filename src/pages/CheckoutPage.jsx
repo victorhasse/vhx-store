@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { couponService } from "../services/couponService";
 import { paymentService } from "../services/paymentService";
 import { shippingService } from "../services/shippingService";
@@ -778,7 +778,7 @@ export default function CheckoutPage() {
     return () => {
       active = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   async function handleApplyCoupon() {
     const normalizedCode = couponCode.trim().toUpperCase();

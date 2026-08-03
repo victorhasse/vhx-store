@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { authService } from "../services/authService";
 import { useTranslation } from "react-i18next";
 import CashbackSection from "../components/profile/CashbackSection";
 
 export default function ProfilePage() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -24,7 +24,7 @@ export default function ProfilePage() {
       .then((res) => setProfile(res.data))
       .catch(() => setError(t("profile.error_load_profile")))
       .finally(() => setLoading(false));
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, t]);
 
   function handleLogout() {
     logout();

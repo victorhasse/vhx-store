@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import { productService } from "../../services/productService";
-import { authService } from "../../services/authService";
 import { useTranslation } from "react-i18next";
 
 export default function AdminPage() {

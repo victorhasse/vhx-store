@@ -51,15 +51,15 @@ export default function ProductDetail() {
   useEffect(() => {
     productService
       .getById(id)
-      .then((res) => setProduct(res.data))
+      .then((res) => {
+        const loadedProduct = res.data;
+
+        setProduct(loadedProduct);
+        setActiveImage(getPrimaryImage(loadedProduct, null));
+      })
       .catch(() => setError(t("product.not_found")))
       .finally(() => setLoading(false));
-  }, [id]);
-  useEffect(() => {
-    if (!product) return;
-
-    setActiveImage(getPrimaryImage(product, null));
-  }, [product]);
+  }, [id, t]);
   const colors = getProductColors(product);
   const variants = getProductVariants(product);
 

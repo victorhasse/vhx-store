@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./useAuth";
 import { wishlistService } from "../services/wishlistService";
 
 const WishlistContext = createContext(null);
