@@ -139,7 +139,8 @@
     "error_select_delivery": "Calculate shipping and select a delivery option.",
     "vhx_advice_amount": "Orders using VHX Cash do not earn new VHX Cash.",
     "vhx_item_not_valid": "The products in this order are not eligible for VHX Cash.",
-    "vhx_30days": "Credit will be unlocked after delivery and is valid for 30 days."
+    "vhx_30days": "Credit will be unlocked after delivery and is valid for 30 days.",
+    "vhx_use_balance": "Use VHX Cash balance — coming soon"
   },
   "profile": {
     "title": "My Profile",

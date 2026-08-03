@@ -139,7 +139,8 @@
     "error_select_delivery": "Calcule o frete e selecione uma modalidade de entrega.",
     "vhx_advice_amount": "Pedidos que utilizam VHX Cash não acumulam novo VHX Cash.",
     "vhx_item_not_valid": "Os produtos deste pedido não são elegíveis para VHX Cash.",
-    "vhx_30days": "O crédito será liberado após a entrega e terá validade de 30 dias."
+    "vhx_30days": "O crédito será liberado após a entrega e terá validade de 30 dias.",
+    "vhx_use_balance": "Usar saldo VHX Cash — em breve"
   },
   "profile": {
     "title": "Meu Perfil",
