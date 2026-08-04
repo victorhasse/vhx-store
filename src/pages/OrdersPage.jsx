@@ -4,14 +4,41 @@ import { useAuth } from "../context/useAuth";
 import { orderService } from "../services/orderService";
 import { OrderCardSkeleton } from "../components/ui/Skeleton";
 import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/useCurrency";
 
-function formatTrackingDate(value) {
+function getDateLocale(language) {
+  return language?.startsWith("en") ? "en-US" : "pt-BR";
+}
+
+function formatTrackingDate(value, locale) {
   if (!value) return "";
 
-  return new Intl.DateTimeFormat("pt-BR", {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "short",
     timeStyle: "short",
-  }).format(new Date(value));
+  }).format(date);
+}
+
+function formatOrderDate(value, locale) {
+  if (!value) return "";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }
 
 export default function OrdersPage() {
@@ -19,8 +46,9 @@ export default function OrdersPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
-
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.resolvedLanguage || i18n.language);
+  const { formatPrice } = useCurrency();
   const STATUS_MAP = {
     pending: {
       label: t("orders.pending"),
@@ -114,11 +142,7 @@ export default function OrdersPage() {
                         {t("orders.order")} #{String(order.id).padStart(6, "0")}
                       </p>
                       <p className="text-xs text-white/30">
-                        {new Date(order.createdAt).toLocaleDateString("pt-BR", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        })}
+                        {formatOrderDate(order.createdAt, dateLocale)}
                       </p>
                     </div>
                     <div className="text-right">
@@ -185,14 +209,14 @@ export default function OrdersPage() {
                             {order.shipped_at && (
                               <p className="mt-1 text-xs text-white/30">
                                 {t("orders.shipped_at")}:{" "}
-                                {formatTrackingDate(order.shipped_at)}
+                                {formatTrackingDate(order.shipped_at, dateLocale)}
                               </p>
                             )}
 
                             {order.delivered_at && (
                               <p className="mt-1 text-xs text-white/30">
                                 {t("orders.delivered_at")}:{" "}
-                                {formatTrackingDate(order.delivered_at)}
+                                {formatTrackingDate(order.delivered_at, dateLocale)}
                               </p>
                             )}
                           </>
@@ -220,14 +244,11 @@ export default function OrdersPage() {
                     {Number(order.discount_amount || 0) > 0 && (
                       <div className="mb-3 flex items-center justify-between text-xs">
                         <span className="uppercase tracking-wider text-[#C8F135]">
-                          Cupom {order.coupon_code}
+                          {t("checkout.discount")} {order.coupon_code}
                         </span>
 
                         <span className="text-[#C8F135]">
-                          − R${" "}
-                          {Number(order.discount_amount)
-                            .toFixed(2)
-                            .replace(".", ",")}
+                          − {formatPrice(order.discount_amount)}
                         </span>
                       </div>
                     )}
@@ -242,7 +263,7 @@ export default function OrdersPage() {
 
                       <div className="text-right">
                         <p className="text-[9px] uppercase tracking-widest text-white/20">
-                          Total pago
+                          {t("orders.total_paid")}
                         </p>
 
                         <p
@@ -251,10 +272,7 @@ export default function OrdersPage() {
                           }}
                           className="text-xl tracking-wider text-[#C8F135]"
                         >
-                          R${" "}
-                          {Number(order.total || 0)
-                            .toFixed(2)
-                            .replace(".", ",")}
+                          {formatPrice(order.total)}
                         </p>
                       </div>
                     </div>

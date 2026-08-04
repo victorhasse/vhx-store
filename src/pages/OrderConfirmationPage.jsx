@@ -2,21 +2,34 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { orderService } from "../services/orderService";
 import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/useCurrency";
 
-function formatTrackingDate(value) {
+function getDateLocale(language) {
+  return language?.startsWith("en") ? "en-US" : "pt-BR";
+}
+
+function formatTrackingDate(value, locale) {
   if (!value) return "";
 
-  return new Intl.DateTimeFormat("pt-BR", {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "short",
     timeStyle: "short",
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export default function OrderConfirmPage() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = getDateLocale(i18n.resolvedLanguage || i18n.language);
+  const { formatPrice } = useCurrency();
 
   const STATUS_MAP = {
     pending: {
@@ -168,10 +181,7 @@ export default function OrderConfirmPage() {
                     }}
                     className="text-lg text-[#C8F135]"
                   >
-                    R${" "}
-                    {(Number(item.price) * item.quantity)
-                      .toFixed(2)
-                      .replace(".", ",")}
+                    {formatPrice(Number(item.price) * item.quantity)}
                   </p>
                 </div>
               );
@@ -182,10 +192,7 @@ export default function OrderConfirmPage() {
               <span className="text-white/40">Subtotal</span>
 
               <span className="text-white/70">
-                R${" "}
-                {Number(order.subtotal || 0)
-                  .toFixed(2)
-                  .replace(".", ",")}
+                {formatPrice(order.subtotal)}
               </span>
             </div>
 
@@ -193,7 +200,7 @@ export default function OrderConfirmPage() {
               <>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/40">
-                    Cupom
+                    {t("checkout.discount")}
                     {order.coupon_code && (
                       <span className="ml-2 uppercase text-[#C8F135]">
                         {order.coupon_code}
@@ -202,8 +209,7 @@ export default function OrderConfirmPage() {
                   </span>
 
                   <span className="text-[#C8F135]">
-                    − R${" "}
-                    {Number(order.discount_amount).toFixed(2).replace(".", ",")}
+                    − {formatPrice(order.discount_amount)}
                   </span>
                 </div>
               </>
@@ -213,10 +219,7 @@ export default function OrderConfirmPage() {
               <span className="text-white/40">Frete</span>
 
               <span className="text-white/70">
-                R${" "}
-                {Number(order.shipping_price || 0)
-                  .toFixed(2)
-                  .replace(".", ",")}
+                {formatPrice(order.shipping_price)}
               </span>
             </div>
 
@@ -231,10 +234,7 @@ export default function OrderConfirmPage() {
                 }}
                 className="text-2xl text-[#C8F135]"
               >
-                R${" "}
-                {Number(order.total || 0)
-                  .toFixed(2)
-                  .replace(".", ",")}
+                {formatPrice(order.total)}
               </span>
             </div>
           </div>
@@ -280,14 +280,14 @@ export default function OrderConfirmPage() {
                   {order.shipped_at && (
                     <p>
                       {t("orders.shipped_at")}:{" "}
-                      {formatTrackingDate(order.shipped_at)}
+                      {formatTrackingDate(order.shipped_at, dateLocale)}
                     </p>
                   )}
 
                   {order.delivered_at && (
                     <p className="mt-1">
                       {t("orders.delivered_at")}:{" "}
-                      {formatTrackingDate(order.delivered_at)}
+                      {formatTrackingDate(order.delivered_at, dateLocale)}
                     </p>
                   )}
                 </div>
