@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import { ProductCardSkeleton } from "../components/ui/Skeleton";
 import { useTranslation } from "react-i18next";
 import WishlistButton from "../components/ui/WishlistButton";
+import { useCurrency } from "../context/useCurrency";
 
 const HERO_IMAGES = [
   "https://res.cloudinary.com/duznkmwkf/image/upload/v1779084460/cena1_pxymjz.png",
@@ -16,6 +17,7 @@ function ProductCard({ product }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
 
   const CATEGORY_LABELS = {
     camisetas: t("products.shirts"),
@@ -94,7 +96,7 @@ function ProductCard({ product }) {
             }}
             className="text-xl tracking-wider text-[#C8F135]"
           >
-            R$ {Number(product.price).toFixed(2).replace(".", ",")}
+            {formatPrice(product.price)}
           </span>
 
           <button

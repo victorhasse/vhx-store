@@ -95,9 +95,9 @@
     "calculate_shipping": "Calcular Frete",
     "choose_delivery": "Escolha a entrega",
     "shipping_estimate": {
-     "exact_days_one": "Entrega em até {{count}} dia útil",
-     "exact_days_other": "Entrega em até {{count}} dias úteis",
-     "range_days": "Entrega entre {{min}} e {{max}} dias úteis"
+      "exact_days_one": "Entrega em até {{count}} dia útil",
+      "exact_days_other": "Entrega em até {{count}} dias úteis",
+      "range_days": "Entrega entre {{min}} e {{max}} dias úteis"
     },
     "street": "Rua",
     "street_name": "Nome da rua",
@@ -106,7 +106,7 @@
     "complement_options": "Apto, bloco...",
     "neighborhood": "Bairro",
     "city": "Cidade",
-    "your_city": "Sua cidade", 
+    "your_city": "Sua cidade",
     "state": "Estado",
     "secure": "Pagamento seguro via Stripe — modo teste",
     "test_card": "Cartão de teste",
@@ -140,7 +140,12 @@
     "vhx_advice_amount": "Pedidos que utilizam VHX Cash não acumulam novo VHX Cash.",
     "vhx_item_not_valid": "Os produtos deste pedido não são elegíveis para VHX Cash.",
     "vhx_30days": "O crédito será liberado após a entrega e terá validade de 30 dias.",
-    "vhx_use_balance": "Usar saldo VHX Cash — em breve"
+    "vhx_use_balance": "Usar saldo VHX Cash — em breve",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "usd_estimate": "Os valores em USD são estimativas baseadas na cotação de referência.",
+    "charged_in_brl": "A cobrança será processada em BRL no valor de {{amount}}.",
+    "cashback_missing": "Faltam {{amount}} em produtos para acumular VHX Cash."
   },
   "profile": {
     "title": "Meu Perfil",

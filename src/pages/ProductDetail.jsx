@@ -5,6 +5,7 @@ import { productService } from "../services/productService";
 import { useTranslation } from "react-i18next";
 import WishlistButton from "../components/ui/WishlistButton";
 import ProductCard from "../components/products/ProductCard";
+import { useCurrency } from "../context/useCurrency";
 
 import {
   findSelectedVariant,
@@ -21,6 +22,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
 
   const SIZES = [
     { value: "S", label: t("product.sizes.S") },
@@ -425,7 +427,7 @@ export default function ProductDetail() {
               style={{ fontFamily: '"Bebas Neue",sans-serif' }}
               className="text-4xl tracking-wider text-[#C8F135] mb-8"
             >
-              R$ {displayedPrice.toFixed(2).replace(".", ",")}
+              {formatPrice(displayedPrice)}
             </p>
 
             <p className="text-white/50 text-sm leading-relaxed mb-10">

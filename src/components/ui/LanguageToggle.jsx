@@ -1,28 +1,46 @@
-import { useTranslation } from 'react-i18next'
+import { useRegion } from "../../context/useRegion";
 
 export default function LanguageToggle() {
-  const { i18n } = useTranslation()
-  const isEN = i18n.language?.startsWith('en')
+  const { regionCode, changeRegion } = useRegion();
+  const isBR = regionCode === "BR";
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-2"
+      role="group"
+      aria-label="Selecionar região"
+    >
       <button
-        onClick={() => i18n.changeLanguage('pt')}
-        className={`text-[11px] tracking-wider transition-all duration-200 flex items-center gap-1 ${
-          !isEN ? 'text-brand-white' : 'text-brand-muted hover:text-brand-white'
+        type="button"
+        onClick={() => changeRegion("BR")}
+        aria-pressed={isBR}
+        className={`flex items-center gap-1 text-[11px] tracking-wider transition-all duration-200 ${
+          isBR
+            ? "text-brand-white"
+            : "text-brand-muted hover:text-brand-white"
         }`}
       >
-        🇧🇷 <span>PT</span>
+        <span aria-hidden="true">🇧🇷</span>
+        <span>BR</span>
       </button>
-      <span className="text-brand-border text-[10px]">|</span>
+
+      <span aria-hidden="true" className="text-[10px] text-brand-border">
+        |
+      </span>
+
       <button
-        onClick={() => i18n.changeLanguage('en')}
-        className={`text-[11px] tracking-wider transition-all duration-200 flex items-center gap-1 ${
-          isEN ? 'text-brand-white' : 'text-brand-muted hover:text-brand-white'
+        type="button"
+        onClick={() => changeRegion("US")}
+        aria-pressed={!isBR}
+        className={`flex items-center gap-1 text-[11px] tracking-wider transition-all duration-200 ${
+          !isBR
+            ? "text-brand-white"
+            : "text-brand-muted hover:text-brand-white"
         }`}
       >
-        🇺🇸 <span>EN</span>
+        <span aria-hidden="true">🇺🇸</span>
+        <span>US</span>
       </button>
     </div>
-  )
+  );
 }

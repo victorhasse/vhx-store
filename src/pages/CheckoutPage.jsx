@@ -15,6 +15,7 @@ import { couponService } from "../services/couponService";
 import { paymentService } from "../services/paymentService";
 import { shippingService } from "../services/shippingService";
 import { cashbackService } from "../services/cashbackService";
+import { useCurrency } from "../context/useCurrency";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const CASHBACK_RATE = 5;
@@ -53,18 +54,17 @@ function VhxCashCard({
   const { t } = useTranslation();
 
   if (cashbackRedeemed > 0) {
-    message = (t("checkout.vhx_advice_amount"));
+    message = t("checkout.vhx_advice_amount");
   } else if (productsTotal < CASHBACK_MINIMUM_ORDER_AMOUNT) {
     const missingAmount = CASHBACK_MINIMUM_ORDER_AMOUNT - productsTotal;
 
-    message = `Faltam R$ ${formatCurrency(
-      missingAmount,
-    )} em produtos para acumular VHX Cash.`;
+    message = t("checkout.cashback_missing", {
+      amount: formatPrice(missingAmount),
+    });
   } else if (eligibleAmount <= 0) {
-    message = (t("checkout.vhx_item_not_valid"));
+    message = t("checkout.vhx_item_not_valid");
   } else {
-    message =
-      (t("checkout.vhx_30days"));
+    message = t("checkout.vhx_30days");
   }
 
   return (
@@ -76,7 +76,7 @@ function VhxCashCard({
           </p>
 
           <p className="mt-1 text-xs leading-relaxed text-white/40">
-            {t("checkout.vhx_info", {rate: CASHBACK_RATE})}
+            {t("checkout.vhx_info", { rate: CASHBACK_RATE })}
           </p>
         </div>
 
@@ -91,7 +91,7 @@ function VhxCashCard({
             }}
             className="mt-1 text-2xl tracking-wider text-[#C8F135]"
           >
-            R$ {formatCurrency(estimatedCashback)}
+            {formatPrice(estimatedCashback)}
           </p>
         </div>
       </div>
@@ -117,6 +117,7 @@ function VhxCashCard({
       </button>
     </div>
   );
+  const { formatPrice } = useCurrency();
 }
 
 function CheckoutForm({
@@ -160,6 +161,7 @@ function CheckoutForm({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { formatPrice, formatBrl, isUsdEstimate } = useCurrency();
 
   function handleAddressChange(event) {
     const { name, value } = event.target;
@@ -380,7 +382,7 @@ function CheckoutForm({
                 </div>
 
                 <span className="text-sm text-[#C8F135] ml-4 flex-shrink-0">
-                  R$ {formatCurrency(option.price)}
+                  {formatPrice(option.price)}
                 </span>
               </button>
             );
@@ -693,7 +695,19 @@ function CheckoutForm({
           {error}
         </div>
       )}
+      {isUsdEstimate && (
+        <div className="border border-white/10 bg-white/[0.02] px-4 py-3">
+          <p className="text-[11px] leading-relaxed text-white/40">
+            {t("checkout.usd_estimate")}
+          </p>
 
+          <p className="mt-1 text-[11px] leading-relaxed text-white/60">
+            {t("checkout.charged_in_brl", {
+              amount: formatBrl(displayTotal),
+            })}
+          </p>
+        </div>
+      )}
       <button
         type="submit"
         disabled={loading || !stripe}
@@ -701,7 +715,7 @@ function CheckoutForm({
       >
         {loading
           ? t("checkout.processing")
-          : `${t("checkout.pay")} R$ ${formatCurrency(displayTotal)}`}
+          : `${t("checkout.pay")} ${formatPrice(displayTotal)}`}
       </button>
     </form>
   );
@@ -711,6 +725,7 @@ export default function CheckoutPage() {
   const { items, totalPrice } = useCart();
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const { formatPrice, formatBrl, isUsdEstimate } = useCurrency();
 
   const [address, setAddress] = useState({
     street: "",
@@ -1090,7 +1105,7 @@ export default function CheckoutPage() {
                     </span>
 
                     <span className="text-white/70 flex-shrink-0">
-                      R$ {formatCurrency(item.price * item.quantity)}
+                      {formatPrice(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -1098,10 +1113,12 @@ export default function CheckoutPage() {
 
               <div className="border-t border-white/5 pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">Subtotal</span>
+                  <span className="text-white/40">
+                    {t("checkout.subtotal")}
+                  </span>
 
                   <span className="text-white/70">
-                    R$ {formatCurrency(totalPrice)}
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
 
@@ -1112,7 +1129,7 @@ export default function CheckoutPage() {
                     </span>
 
                     <span className="text-[#C8F135]">
-                      − R$ {formatCurrency(discountAmount)}
+                      − {formatPrice(discountAmount)}
                     </span>
                   </div>
                 )}
@@ -1122,24 +1139,26 @@ export default function CheckoutPage() {
                     <span className="text-white/40">VHX Cash</span>
 
                     <span className="text-[#C8F135]">
-                      − R$ {formatCurrency(normalizedCashbackAmount)}
+                      − {formatPrice(normalizedCashbackAmount)}
                     </span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">{t("checkout.shipping")}</span>
+                  <span className="text-white/40">
+                    {t("checkout.shipping")}
+                  </span>
 
                   <span className="text-white/70">
                     {selectedShipping
-                      ? `R$ ${formatCurrency(shippingPrice)}`
-                      : (t("checkout.tbc"))}
+                      ? formatPrice(shippingPrice)
+                      : t("checkout.tbc")}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-baseline border-t border-white/5 pt-4">
                   <span className="text-sm text-white/40 tracking-wider">
-                    Total
+                    {t("checkout.total")}
                   </span>
 
                   <span
@@ -1148,7 +1167,7 @@ export default function CheckoutPage() {
                     }}
                     className="text-3xl tracking-wider text-[#C8F135]"
                   >
-                    R$ {formatCurrency(displayTotal)}
+                    {formatPrice(displayTotal)}
                   </span>
                 </div>
               </div>
@@ -1166,6 +1185,20 @@ export default function CheckoutPage() {
                 <p className="text-xs text-white/40 mt-3">
                   {t("checkout.vhx_advice")}
                 </p>
+              )}
+
+              {isUsdEstimate && (
+                <div className="border-t border-white/5 pt-3">
+                  <p className="text-[10px] leading-relaxed text-white/30">
+                    {t("checkout.usd_estimate")}
+                  </p>
+
+                  <p className="mt-1 text-[10px] leading-relaxed text-white/45">
+                    {t("checkout.charged_in_brl", {
+                      amount: formatBrl(displayTotal),
+                    })}
+                  </p>
+                </div>
               )}
 
               <VhxCashCard

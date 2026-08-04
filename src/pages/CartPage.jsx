@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useTranslation } from "react-i18next";
+import { useCurrency } from "../context/useCurrency";
 
 export default function CartPage() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
 
   const CATEGORY_LABELS = {
     camisetas: t("products.shirts"),
@@ -110,7 +112,7 @@ export default function CartPage() {
               style={{ fontFamily: '"Bebas Neue",sans-serif' }}
               className="text-xl tracking-wider text-[#C8F135]"
             >
-              R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
+              {formatPrice(item.price * item.quantity)}
             </span>
           </div>
         </div>
@@ -188,7 +190,7 @@ export default function CartPage() {
                     {t("cart.items")} ({totalItems})
                   </span>
                   <span className="text-white/70">
-                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">

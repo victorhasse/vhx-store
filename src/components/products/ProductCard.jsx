@@ -5,16 +5,14 @@ import { useTranslation } from "react-i18next";
 import { useCart } from "../../context/CartContext";
 import { useScrollFadeIn } from "../../hooks/useFadeIn";
 import WishlistButton from "../ui/WishlistButton";
+import { useCurrency } from "../../context/useCurrency";
 
 function getProductStock(product) {
-  const variants = Array.isArray(product.variants)
-    ? product.variants
-    : [];
+  const variants = Array.isArray(product.variants) ? product.variants : [];
 
   if (variants.length > 0) {
     return variants.reduce(
-      (total, variant) =>
-        total + Number(variant.stock || 0),
+      (total, variant) => total + Number(variant.stock || 0),
       0,
     );
   }
@@ -23,29 +21,18 @@ function getProductStock(product) {
 }
 
 function getProductImage(product) {
-  const images = Array.isArray(product.images)
-    ? product.images
-    : [];
+  const images = Array.isArray(product.images) ? product.images : [];
 
-  const image =
-    images.find((item) => item.is_primary) ||
-    images[0];
+  const image = images.find((item) => item.is_primary) || images[0];
 
-  return (
-    product.image_url ||
-    image?.image_url ||
-    null
-  );
+  return product.image_url || image?.image_url || null;
 }
 
-export default function ProductCard({
-  product,
-  index = 0,
-}) {
+export default function ProductCard({ product, index = 0 }) {
   const { addItem } = useCart();
   const { t } = useTranslation();
   const { ref, visible } = useScrollFadeIn();
-
+  const { formatPrice } = useCurrency();
   const [added, setAdded] = useState(false);
 
   const categoryLabels = {
@@ -56,9 +43,7 @@ export default function ProductCard({
     tenis: t("products.sneakers"),
   };
 
-  const variants = Array.isArray(product.variants)
-    ? product.variants
-    : [];
+  const variants = Array.isArray(product.variants) ? product.variants : [];
 
   const requiresSelection = variants.length > 0;
   const stock = getProductStock(product);
@@ -80,18 +65,12 @@ export default function ProductCard({
   return (
     <div
       ref={ref}
-      className={`fade-in stagger-${Math.min(
-        index + 1,
-        8,
-      )} ${
+      className={`fade-in stagger-${Math.min(index + 1, 8)} ${
         visible ? "visible" : ""
       } group bg-[#111] rounded-sm overflow-hidden`}
     >
       <div className="relative aspect-[3/4] bg-[#1a1a1a] overflow-hidden">
-        <Link
-          to={`/produtos/${product.id}`}
-          className="block h-full w-full"
-        >
+        <Link to={`/produtos/${product.id}`} className="block h-full w-full">
           {image ? (
             <img
               src={image}
@@ -133,8 +112,7 @@ export default function ProductCard({
 
       <div className="p-4">
         <p className="text-[10px] tracking-widest uppercase text-white/30 mb-1">
-          {categoryLabels[product.category] ||
-            product.category}
+          {categoryLabels[product.category] || product.category}
         </p>
 
         <Link to={`/produtos/${product.id}`}>
@@ -146,15 +124,11 @@ export default function ProductCard({
         <div className="flex items-center justify-between gap-2">
           <span
             style={{
-              fontFamily:
-                '"Bebas Neue", sans-serif',
+              fontFamily: '"Bebas Neue", sans-serif',
             }}
             className="text-xl tracking-wider text-[#C8F135]"
           >
-            R${" "}
-            {Number(product.price)
-              .toFixed(2)
-              .replace(".", ",")}
+            {formatPrice(product.price)}
           </span>
 
           {requiresSelection ? (
@@ -175,9 +149,7 @@ export default function ProductCard({
                   : "border-white/10 text-white/40 hover:border-[#C8F135] hover:text-[#C8F135]"
               } disabled:opacity-30 disabled:pointer-events-none`}
             >
-              {added
-                ? t("products.added")
-                : t("products.add_cart")}
+              {added ? t("products.added") : t("products.add_cart")}
             </button>
           )}
         </div>
