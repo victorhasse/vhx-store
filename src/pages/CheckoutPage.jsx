@@ -52,6 +52,7 @@ function VhxCashCard({
   let message;
 
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
 
   if (cashbackRedeemed > 0) {
     message = t("checkout.vhx_advice_amount");
@@ -117,7 +118,6 @@ function VhxCashCard({
       </button>
     </div>
   );
-  const { formatPrice } = useCurrency();
 }
 
 function CheckoutForm({
