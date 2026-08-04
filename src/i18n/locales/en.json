@@ -224,7 +224,8 @@
     "you_saved": "You Saved",
     "type_code": "Type the Code",
     "apply": "Apply",
-    "applying": "Applying..."
+    "applying": "Applying...",
+    "total_paid": "Total paid"
   },
   "order_confirmation": {
     "title": "Order confirmed!",

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { cashbackService } from "../../services/cashbackService";
+import { useCurrency } from "../../context/useCurrency";
 
 const TRANSACTION_LABELS = {
   earned: "cashback.transaction_earned",
@@ -21,6 +22,7 @@ function parseMoney(value) {
 
 export default function CashbackSection() {
   const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency();
 
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -35,14 +37,7 @@ export default function CashbackSection() {
   const [error, setError] = useState(null);
 
   const locale = i18n.resolvedLanguage === "en" ? "en-US" : "pt-BR";
-
-  const currencyFormatter = new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: "BRL",
-  });
-
-  const formatMoney = (value) => currencyFormatter.format(parseMoney(value));
-
+  const formatMoney = (value) => formatPrice(parseMoney(value));
   const formatDate = (value) => {
     if (!value) {
       return "—";

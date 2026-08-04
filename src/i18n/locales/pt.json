@@ -224,7 +224,8 @@
     "you_saved": "Você economizou",
     "type_code": "Digite o Código",
     "apply": "Aplicar",
-    "applying": "Aplicando..."
+    "applying": "Aplicando...",
+    "total_paid": "Total pago"
   },
   "order_confirmation": {
     "title": "Pedido confirmado!",

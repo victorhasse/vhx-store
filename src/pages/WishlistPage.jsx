@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAuth } from "../context/useAuth";
 import { useWishlist } from "../context/WishlistContext";
+import { useCurrency } from "../context/useCurrency";
 
 function getProductImage(product) {
   const images = Array.isArray(product?.images) ? product.images : [];
@@ -15,6 +16,7 @@ function getProductImage(product) {
 export default function WishlistPage() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { formatPrice } = useCurrency();
 
   const { items, loading, error, removeFromWishlist, loadWishlist } =
     useWishlist();
@@ -197,7 +199,7 @@ export default function WishlistPage() {
                           fontFamily: '"Bebas Neue", sans-serif',
                         }}
                       >
-                        R$ {Number(product.price).toFixed(2).replace(".", ",")}
+                        {formatPrice(product.price)}
                       </span>
 
                       <Link
