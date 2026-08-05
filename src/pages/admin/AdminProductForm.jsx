@@ -7,7 +7,9 @@ const CATEGORIES = ["camisetas", "calcas", "moletons", "acessorios", "tenis"];
 
 const EMPTY = {
   name: "",
+  name_en: "",
   description: "",
+  description_en: "",
   price: "",
   category: "camisetas",
   stock: "",
@@ -37,7 +39,9 @@ export default function AdminProductForm() {
       .then((res) =>
         setForm({
           name: res.data.name ?? "",
+          name_en: res.data.name_en ?? "",
           description: res.data.description ?? "",
+          description_en: res.data.description_en ?? "",
           price: res.data.price ?? "",
           category: res.data.category ?? "camisetas",
           stock: res.data.stock ?? "",
@@ -60,7 +64,7 @@ export default function AdminProductForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name || !form.price || !form.category) {
+    if (!form.name.trim() || !form.price || !form.category) {
       setError(t("admin.error_all_fields"));
       return;
     }
@@ -87,6 +91,10 @@ export default function AdminProductForm() {
 
       const payload = {
         ...form,
+        name: form.name.trim(),
+        name_en: form.name_en.trim() || null,
+        description: form.description.trim() || null,
+        description_en: form.description_en.trim() || null,
         price: Number(form.price),
         stock: Number(form.stock) || 0,
         weight: optionalNumber(form.weight),
@@ -159,6 +167,21 @@ export default function AdminProductForm() {
             />
           </div>
 
+          {/* Nome em inglês */}
+          <div>
+            <label className="mb-2 block text-[11px] uppercase tracking-widest text-white/30">
+              Nome em inglês <span className="text-white/20">(opcional)</span>
+            </label>
+
+            <input
+              name="name_en"
+              value={form.name_en}
+              onChange={handleChange}
+              placeholder="Ex: VHX Oversized Tee"
+              className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20"
+            />
+          </div>
+
           {/* Descrição */}
           <div>
             <label className="block text-[11px] tracking-widest uppercase text-white/30 mb-2">
@@ -169,6 +192,23 @@ export default function AdminProductForm() {
               value={form.description}
               onChange={handleChange}
               placeholder="Descrição do produto..."
+              rows={3}
+              className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20 resize-none"
+            />
+          </div>
+
+          {/* Descrição em inglês */}
+          <div>
+            <label className="mb-2 block text-[11px] uppercase tracking-widest text-white/30">
+              Descrição em inglês{" "}
+              <span className="text-white/20">(opcional)</span>
+            </label>
+
+            <textarea
+              name="description_en"
+              value={form.description_en}
+              onChange={handleChange}
+              placeholder="Product description in English..."
               rows={3}
               className="w-full bg-[#111] border border-white/10 text-white/80 text-sm px-4 py-3 outline-none focus:border-[#C8F135] transition-colors placeholder:text-white/20 resize-none"
             />

@@ -7,6 +7,7 @@ import { t } from "i18next";
 
 const EMPTY_COLOR = {
   name: "",
+  name_en: "",
   hex_code: "#000000",
 };
 
@@ -32,6 +33,8 @@ export default function AdminProductOptions() {
   const [product, setProduct] = useState(null);
 
   const [colorForm, setColorForm] = useState(EMPTY_COLOR);
+
+  const [editingColorId, setEditingColorId] = useState(null);
 
   const [variantForm, setVariantForm] = useState(EMPTY_VARIANT);
 
@@ -68,7 +71,25 @@ export default function AdminProductOptions() {
     loadProduct();
   }, [loadProduct]);
 
-  async function handleCreateColor(event) {
+  function handleEditColor(color) {
+    setEditingColorId(color.id);
+
+    setColorForm({
+      name: color.name ?? "",
+      name_en: color.name_en ?? "",
+      hex_code: color.hex_code ?? "#000000",
+    });
+
+    setError("");
+  }
+
+  function handleCancelColorEdit() {
+    setEditingColorId(null);
+    setColorForm(EMPTY_COLOR);
+    setError("");
+  }
+
+  async function handleSubmitColor(event) {
     event.preventDefault();
 
     if (!colorForm.name.trim()) {
@@ -79,17 +100,29 @@ export default function AdminProductOptions() {
     setSaving(true);
     setError("");
 
-    try {
-      await productService.createColor(id, {
-        name: colorForm.name.trim(),
-        hex_code: colorForm.hex_code,
-      });
+    const payload = {
+      name: colorForm.name.trim(),
+      name_en: colorForm.name_en.trim() || null,
+      hex_code: colorForm.hex_code,
+    };
 
+    try {
+      if (editingColorId) {
+        await productService.updateColor(id, editingColorId, payload);
+      } else {
+        await productService.createColor(id, payload);
+      }
+
+      setEditingColorId(null);
       setColorForm(EMPTY_COLOR);
+
       await loadProduct();
     } catch (requestError) {
       setError(
-        requestError.response?.data?.error || "Não foi possível criar a cor",
+        requestError.response?.data?.error ||
+          (editingColorId
+            ? "Não foi possível atualizar a cor"
+            : "Não foi possível criar a cor"),
       );
     } finally {
       setSaving(false);
@@ -727,8 +760,8 @@ export default function AdminProductOptions() {
           </div>
 
           <form
-            onSubmit={handleCreateColor}
-            className="grid grid-cols-1 md:grid-cols-[1fr_100px_auto] gap-3 mb-8"
+            onSubmit={handleSubmitColor}
+            className="grid grid-cols-1 md:grid-cols-[1fr_1fr_100px_auto] gap-3 mb-8"
           >
             <input
               value={colorForm.name}
@@ -741,7 +774,24 @@ export default function AdminProductOptions() {
               placeholder="Nome da cor"
               className="bg-[#0a0a0a] border border-white/10 text-white px-4 py-3 outline-none focus:border-[#C8F135]"
             />
+            <div>
+              <label className="mb-2 block text-[11px] uppercase tracking-widest text-white/30">
+                Nome em inglês <span className="text-white/20">(opcional)</span>
+              </label>
 
+              <input
+                type="text"
+                value={colorForm.name_en}
+                onChange={(event) =>
+                  setColorForm((previous) => ({
+                    ...previous,
+                    name_en: event.target.value,
+                  }))
+                }
+                placeholder="Ex: Lime green"
+                className="w-full border border-white/10 bg-[#111] px-4 py-3 text-sm text-white/80 outline-none transition-colors placeholder:text-white/20 focus:border-[#C8F135]"
+              />
+            </div>
             <input
               type="color"
               value={colorForm.hex_code}
@@ -760,8 +810,22 @@ export default function AdminProductOptions() {
               disabled={saving}
               className="bg-[#C8F135] text-black px-5 py-3 text-xs font-medium tracking-widest uppercase disabled:opacity-50"
             >
-              {saving ? "Salvando..." : "Adicionar cor"}
+              {saving
+                ? "Salvando..."
+                : editingColorId
+                  ? "Salvar alterações"
+                  : "Adicionar cor"}
             </button>
+            {editingColorId && (
+              <button
+                type="button"
+                onClick={handleCancelColorEdit}
+                disabled={saving}
+                className="border border-white/10 px-5 py-3 text-xs uppercase tracking-widest text-white/50 transition-colors hover:border-white/30 hover:text-white disabled:opacity-50 md:col-start-4"
+              >
+                Cancelar edição
+              </button>
+            )}
           </form>
 
           {product.colors?.length > 0 ? (
@@ -781,18 +845,32 @@ export default function AdminProductOptions() {
                   <div className="flex-1">
                     <p className="text-white">{color.name}</p>
 
-                    <p className="text-white/30 text-xs uppercase tracking-wider">
+                    <p className="text-xs uppercase tracking-wider text-white/30">
                       {color.slug} · {color.hex_code}
                     </p>
+
+                    {color.name_en && (
+                      <p className="mt-1 text-xs text-white/30">
+                        Inglês: {color.name_en}
+                      </p>
+                    )}
                   </div>
 
                   <div className="text-right text-xs text-white/30">
                     <p>{color.images?.length || 0} imagens</p>
                   </div>
-
+                  <button
+                    type="button"
+                    onClick={() => handleEditColor(color)}
+                    disabled={saving}
+                    className="border border-white/10 px-3 py-2 text-[10px] uppercase tracking-widest text-white/50 transition-colors hover:border-[#C8F135]/60 hover:text-[#C8F135] disabled:opacity-50"
+                  >
+                    Editar
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleDeleteColor(color)}
+                    disabled={saving}
                     className="border border-red-500/20 text-red-400 px-3 py-2 text-[10px] tracking-widest uppercase hover:border-red-500/60"
                   >
                     Desativar
