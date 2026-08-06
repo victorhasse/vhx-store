@@ -21,7 +21,7 @@ import {
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { formatPrice } = useCurrency();
 
   const SIZES = [
@@ -268,6 +268,27 @@ export default function ProductDetail() {
     );
   }
 
+  const isEnglish = i18n.resolvedLanguage?.startsWith("en");
+
+  const localizedName =
+    isEnglish && product.name_en ? product.name_en : product.name;
+
+  const localizedDescription =
+    isEnglish && product.description_en
+      ? product.description_en
+      : product.description;
+
+  const localizedCategory =
+    CATEGORY_LABELS[product.category] || product.category;
+
+  const getLocalizedColorName = (color) => {
+    if (!color) return "";
+
+    return i18n.resolvedLanguage?.startsWith("en") && color.name_en
+      ? color.name_en
+      : color.name;
+  };
+
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -281,7 +302,7 @@ export default function ProductDetail() {
             {t("products.title")}
           </Link>
           <span>/</span>
-          <span className="text-white/60">{product.name}</span>
+          <span className="text-white/60">{localizedName}</span>
         </nav>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
@@ -413,14 +434,14 @@ export default function ProductDetail() {
           {/* Info */}
           <div className="flex flex-col justify-center">
             <p className="text-[11px] tracking-widest uppercase text-white/30 mb-3">
-              {CATEGORY_LABELS[product.category] || product.category}
+              {localizedCategory}
             </p>
 
             <h1
               style={{ fontFamily: '"Bebas Neue",sans-serif' }}
               className="text-5xl tracking-widest text-white mb-4"
             >
-              {product.name}
+              {localizedName}
             </h1>
 
             <p
@@ -431,16 +452,16 @@ export default function ProductDetail() {
             </p>
 
             <p className="text-white/50 text-sm leading-relaxed mb-10">
-              {product.description}
+              {localizedDescription}
             </p>
 
             {colors.length > 0 && (
               <div className="mb-8">
                 <p className="text-[11px] tracking-widest uppercase text-white/40 mb-3">
-                  Cor
+                  {t("product.color")}
                   {selectedColor && (
                     <span className="text-white/70 ml-2">
-                      {selectedColor.name}
+                      {getLocalizedColorName(selectedColor)}
                     </span>
                   )}
                 </p>
@@ -450,8 +471,8 @@ export default function ProductDetail() {
                     <button
                       key={color.id}
                       type="button"
-                      title={color.name}
-                      aria-label={`Selecionar cor ${color.name}`}
+                      aria-label={getLocalizedColorName(color)}
+                      title={getLocalizedColorName(color)}
                       onClick={() => handleColorSelect(color)}
                       className={`w-11 h-11 p-1 border transition-all ${
                         Number(selectedColorId) === Number(color.id)
@@ -541,7 +562,7 @@ export default function ProductDetail() {
                   selectedVariant?.sku ||
                     `VHX-${String(product.id).padStart(4, "0")}`,
                 ],
-                [t("product.category"), product.category],
+                [t("product.category"), localizedCategory],
                 [t("product.stock"), `${displayedStock} ${t("product.units")}`],
               ].map(([label, value]) => (
                 <div key={label} className="flex justify-between text-sm">
@@ -557,7 +578,9 @@ export default function ProductDetail() {
             <div className="mb-8">
               <p className="text-[11px] tracking-widest uppercase text-[#C8F135] mb-2">
                 {t("product.recommendations_label", {
-                  defaultValue: "Recomendações",
+                  defaultValue: (
+                    t("products.recommendations") || "Recomendações"
+                  ).toUpperCase(),
                 })}
               </p>
 
@@ -568,7 +591,10 @@ export default function ProductDetail() {
                 className="text-3xl tracking-widest text-white"
               >
                 {t("product.recommendations_title", {
-                  defaultValue: "Você também pode gostar",
+                  defaultValue: (
+                    t("products.recommended_for_you") ||
+                    "Você também pode gostar"
+                  ).toUpperCase(),
                 })}
               </h2>
             </div>

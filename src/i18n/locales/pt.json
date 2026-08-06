@@ -51,7 +51,9 @@
     "added": "✓ Adicionado",
     "last_units": "Últimas",
     "unavailable": "Indisponível",
-    "options": "+ Ver Opções"
+    "options": "+ Ver Opções",
+    "recommendations": "Recomendações",
+    "recommended_for_you": "Você também pode gostar"
   },
   "product": {
     "category": "Categoria",
@@ -69,7 +71,8 @@
       "M": "M",
       "L": "G",
       "XL": "GG"
-    }
+    },
+    "color": "Cor"
   },
   "cart": {
     "title": "Carrinho",

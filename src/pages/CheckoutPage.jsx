@@ -724,8 +724,10 @@ function CheckoutForm({
 export default function CheckoutPage() {
   const { items, totalPrice } = useCart();
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { formatPrice, formatBrl, isUsdEstimate } = useCurrency();
+
+  const stripeLocale = i18n.resolvedLanguage?.startsWith("en") ? "en" : "pt-BR";
 
   const [address, setAddress] = useState({
     street: "",
@@ -1040,7 +1042,11 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
-            <Elements stripe={stripePromise}>
+            <Elements
+              key={stripeLocale}
+              stripe={stripePromise}
+              options={{ locale: stripeLocale }}
+            >
               <CheckoutForm
                 items={items}
                 /*

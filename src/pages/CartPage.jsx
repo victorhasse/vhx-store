@@ -19,6 +19,7 @@ export default function CartPage() {
   function CartItem({ item }) {
     const { removeItem, updateQty } = useCart();
     const { t } = useTranslation();
+    const { formatPrice } = useCurrency();
 
     return (
       <div className="flex gap-6 py-6 border-b border-white/5">
@@ -209,7 +210,7 @@ export default function CartPage() {
                     style={{ fontFamily: '"Bebas Neue",sans-serif' }}
                     className="text-3xl tracking-wider text-[#C8F135]"
                   >
-                    R$ {totalPrice.toFixed(2).replace(".", ",")}
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
               </div>

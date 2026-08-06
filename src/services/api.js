@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.DEV
-    ? "http://localhost:3333/api"
-    : import.meta.env.VITE_API_URL || "https://vhx-api.onrender.com/api",
-  headers: { "Content-Type": "application/json" },
+  baseURL: import.meta.env.VITE_API_URL || "https://vhx-api.onrender.com/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {

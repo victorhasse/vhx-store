@@ -51,7 +51,9 @@
     "added": "✓ Added",
     "last_units": "Last units",
     "unavailable": "Unavailable",
-    "options": "+ See Options"
+    "options": "+ See Options",
+    "recommendations": "Recommendations",
+    "recommended_for_you": "You may also like"
   },
   "product": {
     "category": "Category",
@@ -69,7 +71,8 @@
       "M": "M",
       "L": "L",
       "XL": "XL"
-    }
+    },
+    "color": "Color"
   },
   "cart": {
     "title": "Cart",
